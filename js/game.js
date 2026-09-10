@@ -2,8 +2,8 @@
    Five Nights at Freddy's - clon
    Orquestador: escenas + bucle de noche + oficina + cámaras.
 
-   El elenco está desactivado (ver js/characters.js / js/ai.js), así que
-   la única forma de perder ahora mismo es quedarse sin energía.
+   Dogo está activo con una ruta por el ala este. El resto del elenco
+   permanece reservado para futuras implementaciones.
    ================================================================ */
 (function () {
   "use strict";
@@ -105,6 +105,15 @@
     var urls = [];
     C.CAMS.forEach(function (cam) {
       if (cam.background) urls.push(cam.background);
+    });
+    Object.keys(C.ANIMATRONICS).forEach(function (id) {
+      var a = C.ANIMATRONICS[id];
+      if (a.doorSprite) urls.push(a.doorSprite);
+      if (a.cameraSprites) {
+        Object.keys(a.cameraSprites).forEach(function (camId) {
+          urls.push(a.cameraSprites[camId]);
+        });
+      }
     });
     urls.push(
       "assets/escenarios/sala-seguridad/puerta-izquierda-cerrada.png",
@@ -392,6 +401,7 @@
     ai.update(dt);
     if (ai.isOver()) return;
 
+    renderDogo();
     updateHud();
     requestAnimationFrame(loop);
   }
@@ -442,6 +452,37 @@
     $("btn-right-door").classList.toggle("active", state.doorRight);
     $("btn-left-light").classList.toggle("active", state.lightLeft);
     $("btn-right-light").classList.toggle("active", state.lightRight);
+    renderDogo();
+  }
+
+  function renderDogo() {
+    if (!ai) return;
+    var def = C.ANIMATRONICS.dogo;
+    var doorDogo = $("dogo-door-right");
+    var atRight = ai.atDoor("right").indexOf("dogo") >= 0;
+    doorDogo.classList.toggle(
+      "show",
+      atRight && state.lightRight && !state.doorRight && !state.camOpen
+    );
+
+    var camSprite = $("cam-character");
+    var present = ai.presenceInCam(state.currentCam).some(function (entry) {
+      return entry.id === "dogo";
+    });
+    var src = def.cameraSprites && def.cameraSprites[state.currentCam];
+    if (state.camOpen && present && src) {
+      if (camSprite.getAttribute("src") !== src) camSprite.setAttribute("src", src);
+      var lo = (def.cameraLayout && def.cameraLayout[state.currentCam]) || {};
+      camSprite.style.width = (lo.width || 46) + "%";
+      camSprite.style.left = (lo.left || 50) + "%";
+      camSprite.style.bottom = (lo.bottom || 6) + "%";
+      camSprite.style.mixBlendMode = lo.blend || "normal";
+      camSprite.alt = "Dogo en CÁM " + state.currentCam;
+      camSprite.classList.add("show");
+    } else {
+      camSprite.classList.remove("show");
+      camSprite.alt = "";
+    }
   }
   function canAct() {
     return state.running && state.power > 0 && !ai.isBlackout();
@@ -523,6 +564,7 @@
     [].forEach.call(document.querySelectorAll("#cam-map .cam-btn"), function (b) {
       b.classList.toggle("active", b.dataset.id === id);
     });
+    renderDogo();
   }
   function setCamOpen(open) {
     if (!state.running || state.power <= 0 || ai.isBlackout()) open = false;
@@ -535,6 +577,7 @@
       Sound.camToggle(open);
       if (open) glitchBurst();
     }
+    renderDogo();
     updateHud();
   }
   $("cam-tab").addEventListener("click", function () {

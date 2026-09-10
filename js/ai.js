@@ -1,11 +1,11 @@
 /* ================================================================
    Five Nights at Freddy's - clon
-   MOTOR DE IA DE LOS ANIMATRÓNICOS  (andamiaje)
+   MOTOR DE IA DE LOS ANIMATRÓNICOS
 
-   El elenco está desactivado por ahora, así que el motor no mueve a
-   nadie: sólo gestiona el apagón (cuenta atrás hasta el fin de la
-   noche). Toda la API que usa game.js sigue en su sitio para poder
-   reconectar personajes sin tocar el orquestador.
+   Dogo recorre el ala este con un patrón inspirado en el oso del juego
+   clásico: avanza por una ruta fija y se asoma a la puerta derecha.
+   POR AHORA NO HAY JUMPSCARE: si llega a la puerta y la dejas abierta,
+   tras un rato se retira solo. Cerrar la puerta también lo hace volver.
 
    ----------------------------------------------------------------
    DISEÑO PREVISTO PARA CUANDO VUELVA EL ELENCO
@@ -54,6 +54,7 @@
           def: def,
           room: def.start,
           timer: 0,
+          attackTimer: 0,
         };
       });
     }
@@ -97,17 +98,44 @@
         return;
       }
 
-      // Sin personajes activos: nada que simular.
       for (var id in actors) behave(actors[id], dt);
     }
 
-    // Punto de extensión: aquí irá la lógica de cada especie.
+    // Tiempo que Dogo aguanta en la puerta antes de retirarse solo.
+    var DOOR_LINGER_MS = 6000;
+
     function behave(a, dt) {
+      if (a.room === "DOOR_RIGHT") {
+        // Sin jumpscare: al cerrar la puerta o tras un rato, se retira.
+        a.attackTimer += dt;
+        if (hooks.doorClosed("right") || a.attackTimer >= DOOR_LINGER_MS) {
+          a.room = "1B";
+          a.timer = 0;
+          a.attackTimer = 0;
+        }
+        return;
+      }
+
       a.timer += dt;
       if (a.timer < a.def.moveInterval) return;
       a.timer = 0;
       if (!rollUnder(effLevel(a.id))) return;
-      // TODO: mover a `a` según su ruta / fase y avisar a los hooks.
+
+      // Como Freddy, Dogo no avanza mientras el jugador observa
+      // directamente la cámara en la que se encuentra.
+      if (hooks.cameraUp() && hooks.viewedCam() === a.room) return;
+
+      var index = a.def.path.indexOf(a.room);
+      if (index < 0) index = 0;
+      if (index < a.def.path.length - 1) {
+        a.room = a.def.path[index + 1];
+      } else if (hooks.doorClosed(a.def.door)) {
+        // La puerta derecha cerrada lo hace retroceder hacia el comedor.
+        a.room = "1B";
+      } else {
+        a.room = "DOOR_RIGHT";
+        a.attackTimer = 0;
+      }
     }
 
     return {
@@ -116,11 +144,19 @@
       update: update,
       beginBlackout: beginBlackout,
       isBlackout: isBlackout,
-      presenceInCam: function () {
-        return [];
+      presenceInCam: function (camId) {
+        var found = [];
+        for (var id in actors) {
+          if (actors[id].room === camId) found.push({ id: id });
+        }
+        return found;
       },
-      atDoor: function () {
-        return [];
+      atDoor: function (side) {
+        var found = [];
+        for (var id in actors) {
+          if (side === "right" && actors[id].room === "DOOR_RIGHT") found.push(id);
+        }
+        return found;
       },
       inOffice: function () {
         return [];
