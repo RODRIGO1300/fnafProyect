@@ -1,6 +1,5 @@
 /* ================================================================
    Five Nights at Freddy's - clon
-   Menu principal + arranque basico de partida
    ================================================================ */
 
 * {
@@ -21,7 +20,6 @@ body {
   cursor: default;
 }
 
-/* Contenedor con relacion de aspecto 4:3 centrado */
 #game {
   position: absolute;
   inset: 0;
@@ -34,7 +32,6 @@ body {
   overflow: hidden;
 }
 
-/* ---------- Estatica ---------- */
 #static {
   position: absolute;
   inset: 0;
@@ -46,7 +43,6 @@ body {
   mix-blend-mode: screen;
 }
 
-/* ---------- Escenas ---------- */
 .scene {
   position: absolute;
   inset: 0;
@@ -57,21 +53,16 @@ body {
   display: block;
 }
 @keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* ================================================================
-   MENU PRINCIPAL
+   MENU
    ================================================================ */
 #scene-menu {
   background: radial-gradient(circle at 60% 40%, #1a1015 0%, #050505 75%);
 }
-
 .menu-title {
   position: absolute;
   top: 7%;
@@ -85,13 +76,9 @@ body {
 .menu-title .line {
   font-weight: 700;
   color: #e6e6e6;
-  text-transform: none;
   letter-spacing: 1px;
 }
-.menu-title .small {
-  font-size: 3.2vw;
-  margin-left: 0.3vw;
-}
+.menu-title .small { font-size: 3.2vw; margin-left: 0.3vw; }
 .menu-title .big {
   font-size: 9vw;
   margin-top: -0.5vw;
@@ -103,34 +90,24 @@ body {
   margin-top: 1vw;
   letter-spacing: 2px;
 }
-
 @keyframes title-jitter {
-  0%,
-  97%,
-  100% {
-    transform: translate(0, 0);
-  }
-  97.5% {
-    transform: translate(-2px, 1px);
-  }
-  98.5% {
-    transform: translate(3px, -1px);
-  }
+  0%, 97%, 100% { transform: translate(0, 0); }
+  97.5% { transform: translate(-2px, 1px); }
+  98.5% { transform: translate(3px, -1px); }
 }
-
 .menu-list {
   position: absolute;
   left: 7%;
-  bottom: 14%;
+  bottom: 12%;
   display: flex;
   flex-direction: column;
-  gap: 1.4vw;
+  gap: 1.1vw;
 }
 .menu-item {
   background: none;
   border: none;
   font-family: inherit;
-  font-size: 2.6vw;
+  font-size: 2.4vw;
   color: #8c8c8c;
   text-align: left;
   cursor: pointer;
@@ -142,11 +119,7 @@ body {
   color: #fff;
   text-shadow: 2px 0 rgba(255, 0, 40, 0.5), -2px 0 rgba(0, 200, 255, 0.4);
 }
-.menu-item[disabled] {
-  color: #3d3d3d;
-  cursor: default;
-}
-
+.menu-item[disabled] { color: #3d3d3d; cursor: default; }
 .menu-foot-left {
   position: absolute;
   left: 2%;
@@ -164,11 +137,76 @@ body {
 }
 
 /* ================================================================
-   RECORTE DE PERIODICO
+   ELENCO
    ================================================================ */
-#scene-news {
-  background: #111;
+#scene-roster { background: radial-gradient(circle at 50% 30%, #15100f, #050505 75%); overflow-y: auto; }
+.roster-wrap {
+  position: absolute;
+  inset: 0;
+  padding: 3% 5% 5%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2vw;
+  overflow-y: auto;
 }
+.roster-wrap h2 { font-size: 3vw; color: #e6e6e6; letter-spacing: 3px; }
+.roster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.6vw;
+  width: 100%;
+}
+.roster-card {
+  background: rgba(15, 15, 18, 0.85);
+  border: 1px solid #3a3a3a;
+  padding: 1.2vw;
+  display: flex;
+  gap: 1vw;
+}
+.roster-card .art {
+  width: 34%;
+  min-width: 90px;
+  background: radial-gradient(circle at 50% 35%, #241a17, #0a0807);
+  border: 1px solid #333;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.roster-card .art svg { width: 100%; height: auto; }
+.roster-card .info { flex: 1; }
+.roster-card .info h3 { font-size: 1.5vw; color: #fff; }
+.roster-card .info .role { font-size: 1vw; color: #b06; margin-bottom: 0.5vw; letter-spacing: 1px; }
+.roster-card .info p { font-size: 0.95vw; line-height: 1.45; color: #b8b8b8; margin-bottom: 0.5vw; }
+.roster-card .info .counter { color: #7fd08a; }
+
+/* ================================================================
+   NOCHE PERSONALIZADA
+   ================================================================ */
+#scene-custom { background: radial-gradient(circle at 50% 30%, #15100f, #050505 75%); }
+.custom-wrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5vw;
+}
+.custom-wrap h2 { font-size: 3vw; color: #e6e6e6; letter-spacing: 3px; }
+.custom-help { font-size: 1.2vw; color: #888; }
+.custom-sliders { display: flex; flex-direction: column; gap: 1vw; width: 46%; }
+.custom-row { display: flex; align-items: center; gap: 1vw; font-size: 1.3vw; }
+.custom-row .cname { width: 30%; color: #ddd; }
+.custom-row input[type="range"] { flex: 1; }
+.custom-row .cval { width: 2.5vw; text-align: right; color: #fff; }
+.custom-actions { display: flex; gap: 1vw; margin-top: 1vw; }
+.am-continue.ghost { background: transparent; }
+
+/* ================================================================
+   PERIODICO
+   ================================================================ */
+#scene-news { background: #111; }
 .newspaper {
   position: absolute;
   inset: 0;
@@ -191,28 +229,10 @@ body {
   border-bottom: 3px double #17140f;
   padding-bottom: 1vw;
 }
-.newspaper .lead {
-  font-size: 2.6vw;
-  font-weight: 700;
-  text-align: center;
-  margin: 1.5vw 0;
-}
-.newspaper p {
-  font-size: 1.7vw;
-  line-height: 1.5;
-  margin-bottom: 1vw;
-  text-align: justify;
-}
-.newspaper .pay {
-  font-size: 2.2vw;
-  font-weight: 700;
-  text-align: center;
-}
-.newspaper .small {
-  font-size: 1.2vw;
-  font-style: italic;
-  color: #443;
-}
+.newspaper .lead { font-size: 2.6vw; font-weight: 700; text-align: center; margin: 1.5vw 0; }
+.newspaper p { font-size: 1.7vw; line-height: 1.5; margin-bottom: 1vw; text-align: justify; }
+.newspaper .pay { font-size: 2.2vw; font-weight: 700; text-align: center; }
+.newspaper .small { font-size: 1.2vw; font-style: italic; color: #443; }
 .newspaper .hint {
   position: absolute;
   bottom: 3%;
@@ -224,18 +244,12 @@ body {
   color: #665;
   animation: blink 1s steps(1) infinite;
 }
-@keyframes blink {
-  50% {
-    opacity: 0.2;
-  }
-}
+@keyframes blink { 50% { opacity: 0.2; } }
 
 /* ================================================================
    INTRO DE NOCHE
    ================================================================ */
-#scene-nightintro {
-  background: #000;
-}
+#scene-nightintro { background: #000; }
 .night-intro {
   position: absolute;
   inset: 0;
@@ -250,34 +264,23 @@ body {
   animation: night-fade 3s ease forwards;
 }
 @keyframes night-fade {
-  0% {
-    opacity: 0;
-  }
-  25%,
-  70% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
+  0% { opacity: 0; }
+  25%, 70% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 /* ================================================================
    OFICINA
    ================================================================ */
-#scene-office {
-  background: #000;
-}
-.office-view {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-}
+#scene-office { background: #000; }
+.office-view { position: absolute; inset: 0; overflow: hidden; }
 .office-room {
   position: absolute;
   inset: 0;
   background: linear-gradient(#241b16 0%, #0c0908 60%, #050403 100%);
+  transition: filter 0.3s;
 }
+#scene-office.blackout .office-room { filter: brightness(0.06); }
 .office-room .desk {
   position: absolute;
   left: 50%;
@@ -292,19 +295,25 @@ body {
 .office-room .poster {
   position: absolute;
   left: 50%;
-  top: 22%;
+  top: 20%;
   transform: translateX(-50%) rotate(-2deg);
-  width: 14%;
-  aspect-ratio: 3/4;
+  width: 13%;
+  aspect-ratio: 3 / 4;
   background: #6d1414;
   color: #ffd24a;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.3vw;
+  font-size: 1.2vw;
   text-align: center;
   border: 4px solid #2a0d0d;
 }
+.office-room .poster.golden {
+  background: #000;
+  border-color: #000;
+  padding: 4%;
+}
+.office-room .poster.golden svg { width: 100%; height: 100%; }
 .office-room .door {
   position: absolute;
   top: 0;
@@ -312,59 +321,72 @@ body {
   height: 100%;
   background: linear-gradient(#1b1512, #0a0706);
 }
-.office-room .door-left {
-  left: 0;
-  box-shadow: inset -20px 0 40px #000;
-}
-.office-room .door-right {
-  right: 0;
-  box-shadow: inset 20px 0 40px #000;
-}
+.office-room .door-left { left: 0; box-shadow: inset -20px 0 40px #000; }
+.office-room .door-right { right: 0; box-shadow: inset 20px 0 40px #000; }
 .office-room .door.closed {
   background: #2b2b2b;
-  background-image: repeating-linear-gradient(
-    #232323 0 12px,
-    #161616 12px 24px
-  );
+  background-image: repeating-linear-gradient(#232323 0 12px, #161616 12px 24px);
 }
-.office-room .door.lit {
-  background: linear-gradient(#3a322c, #201a15);
+.office-room .door.lit { background: linear-gradient(#3a322c, #201a15); }
+
+/* animatrónico en el hueco de una puerta (visible con la luz) */
+.anim-doorway {
+  position: absolute;
+  top: 12%;
+  height: 82%;
+  width: 15%;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 3;
+  filter: brightness(0.85) contrast(1.1);
+}
+.anim-doorway.left { left: 0; }
+.anim-doorway.right { right: 0; }
+.anim-doorway.show { display: flex; }
+.anim-doorway svg { height: 100%; width: auto; }
+
+/* animatrónico dentro de la oficina */
+.office-anim {
+  position: absolute;
+  right: 6%;
+  bottom: 0;
+  height: 78%;
+  display: none;
+  z-index: 4;
+  filter: brightness(0.5);
+}
+.office-anim.show { display: block; }
+.office-anim svg { height: 100%; width: auto; }
+
+/* cara de Bruno en el apagón */
+.blackout-face {
+  position: absolute;
+  left: 0;
+  top: 15%;
+  width: 26%;
+  height: 70%;
+  display: none;
+  z-index: 6;
+}
+#scene-office.blackout .blackout-face.show {
+  display: block;
+  animation: blackout-flicker 0.18s steps(1) infinite;
+}
+.blackout-face svg { height: 100%; width: auto; filter: brightness(1.2); }
+@keyframes blackout-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.15; }
 }
 
 /* HUD */
-.hud {
-  position: absolute;
-  z-index: 500;
-  pointer-events: none;
-}
-.hud-time {
-  position: absolute;
-  top: 3%;
-  right: 4%;
-  font-size: 2.6vw;
-  color: #fff;
-}
-.hud-night {
-  position: absolute;
-  top: 9%;
-  right: 4%;
-  font-size: 1.4vw;
-  color: #cfcfcf;
-}
-.hud-power {
-  position: absolute;
-  bottom: 4%;
-  left: 4%;
-  font-size: 1.6vw;
-  color: #fff;
-}
-.hud-power .usage {
-  color: #35d635;
-  margin-left: 0.4vw;
-  letter-spacing: -2px;
-}
+.hud { position: absolute; z-index: 500; pointer-events: none; }
+.hud-time { position: absolute; top: 3%; right: 4%; font-size: 2.6vw; color: #fff; }
+.hud-night { position: absolute; top: 9%; right: 4%; font-size: 1.4vw; color: #cfcfcf; }
+.hud-power { position: absolute; bottom: 4%; left: 4%; font-size: 1.6vw; color: #fff; }
+.hud-power .usage { margin-left: 0.4vw; letter-spacing: -2px; }
 
-/* Controles */
+/* controles */
 .ctrl {
   position: absolute;
   z-index: 500;
@@ -376,31 +398,14 @@ body {
   border: 1px solid #444;
   cursor: pointer;
 }
-.ctrl:hover {
-  background: #2c2c2c;
-}
-.ctrl.active {
-  background: #d8d8d8;
-  color: #111;
-}
-.ctrl-left-door {
-  left: 17%;
-  bottom: 30%;
-}
-.ctrl-left-light {
-  left: 17%;
-  bottom: 24%;
-}
-.ctrl-right-door {
-  right: 17%;
-  bottom: 30%;
-}
-.ctrl-right-light {
-  right: 17%;
-  bottom: 24%;
-}
+.ctrl:hover { background: #2c2c2c; }
+.ctrl.active { background: #d8d8d8; color: #111; }
+.ctrl-left-door { left: 17%; bottom: 30%; }
+.ctrl-left-light { left: 17%; bottom: 24%; }
+.ctrl-right-door { right: 17%; bottom: 30%; }
+.ctrl-right-light { right: 17%; bottom: 24%; }
 
-/* Pestana de camaras */
+/* pestaña de cámaras */
 .cam-tab {
   position: absolute;
   z-index: 500;
@@ -417,11 +422,9 @@ body {
   border-bottom: none;
   cursor: pointer;
 }
-.cam-tab:hover {
-  background: rgba(45, 45, 45, 0.95);
-}
+.cam-tab:hover { background: rgba(45, 45, 45, 0.95); }
 
-/* Panel de camaras */
+/* panel de cámaras */
 .cam-panel {
   position: absolute;
   inset: 0;
@@ -430,44 +433,59 @@ body {
   display: none;
   animation: fade-in 0.15s ease;
 }
-.cam-panel.open {
-  display: block;
-}
-.cam-feed {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(#15130f, #000);
-}
+.cam-panel.open { display: block; }
+.cam-feed { position: absolute; inset: 0; background: linear-gradient(#15130f, #000); overflow: hidden; }
 .cam-feed::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: repeating-linear-gradient(
-    rgba(255, 255, 255, 0.03) 0 2px,
-    transparent 2px 4px
-  );
+  background: repeating-linear-gradient(rgba(255, 255, 255, 0.03) 0 2px, transparent 2px 4px);
   animation: scan 6s linear infinite;
+  pointer-events: none;
 }
-@keyframes scan {
-  to {
-    background-position: 0 200px;
-  }
-}
-.cam-name {
+@keyframes scan { to { background-position: 0 200px; } }
+.cam-name { position: absolute; top: 4%; left: 4%; font-size: 2vw; color: #fff; z-index: 2; }
+.cam-rec { position: absolute; top: 4%; right: 4%; font-size: 1.4vw; color: #ff3b3b; animation: blink 1.4s steps(1) infinite; z-index: 2; }
+.cam-anim {
   position: absolute;
-  top: 4%;
-  left: 4%;
-  font-size: 2vw;
-  color: #fff;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 4%;
+  padding-bottom: 4%;
+  filter: brightness(0.7) contrast(1.15) grayscale(0.3);
 }
-.cam-rec {
+.cam-anim svg { height: 62%; width: auto; }
+.cam-anim.running svg { height: 46%; filter: blur(2px); transform: skewX(-12deg); }
+.cam-disabled {
   position: absolute;
-  top: 4%;
-  right: 4%;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  color: #444;
   font-size: 1.4vw;
-  color: #ff3b3b;
-  animation: blink 1.4s steps(1) infinite;
+  letter-spacing: 3px;
+  text-align: center;
 }
+.cam-disabled span { font-size: 2vw; color: #666; }
+.cam-disabled.show { display: flex; }
+.cove-stage {
+  position: absolute;
+  left: 50%;
+  bottom: 8%;
+  transform: translateX(-50%);
+  font-size: 1.3vw;
+  color: #ffcf5a;
+  letter-spacing: 2px;
+  text-align: center;
+  z-index: 2;
+  display: none;
+}
+.cove-stage.show { display: block; }
 .cam-map {
   position: absolute;
   right: 3%;
@@ -476,6 +494,7 @@ body {
   height: 42%;
   background: rgba(10, 10, 10, 0.9);
   border: 1px solid #555;
+  z-index: 3;
 }
 .cam-btn {
   position: absolute;
@@ -485,24 +504,44 @@ body {
   color: #cfcfcf;
   border: 1px solid #555;
   cursor: pointer;
+  transform: translate(-50%, -50%);
 }
-.cam-btn:hover {
-  background: #333;
+.cam-btn:hover { background: #333; }
+.cam-btn.active { background: #cfcfcf; color: #111; }
+.cam-btn.alert { border-color: #ff3b3b; color: #ff8a8a; }
+
+/* ================================================================
+   JUMPSCARE
+   ================================================================ */
+#jumpscare {
+  position: absolute;
+  inset: 0;
+  z-index: 2000;
+  background: #000;
+  display: none;
+  align-items: center;
+  justify-content: center;
 }
-.cam-btn.active {
-  background: #cfcfcf;
-  color: #111;
+#jumpscare.show { display: flex; animation: js-flash 0.09s steps(1) infinite; }
+.js-sprite { width: 90%; height: 92%; display: flex; align-items: center; justify-content: center; }
+.js-sprite svg { height: 100%; width: auto; animation: js-shake 0.05s linear infinite; }
+@keyframes js-flash {
+  0%, 100% { background: #000; }
+  50% { background: #3a0000; }
+}
+@keyframes js-shake {
+  0% { transform: translate(-6px, 4px) scale(1.02); }
+  25% { transform: translate(5px, -5px) scale(1.06); }
+  50% { transform: translate(-4px, 6px) scale(1.01); }
+  75% { transform: translate(6px, 3px) scale(1.05); }
+  100% { transform: translate(-5px, -4px) scale(1.03); }
 }
 
 /* ================================================================
-   6 A.M. / SIN ENERGIA
+   GAME OVER / 6 A.M.
    ================================================================ */
-#scene-6am,
-#scene-poweroff {
-  background: #000;
-}
-.six-am,
-.power-off {
+#scene-gameover, #scene-6am { background: #000; }
+.gameover, .six-am {
   position: absolute;
   inset: 0;
   display: flex;
@@ -511,31 +550,20 @@ body {
   justify-content: center;
   gap: 2vw;
 }
-.six-am .am-time {
-  font-size: 6vw;
-  color: #fff;
-  letter-spacing: 6px;
-}
-.six-am .am-sub {
-  font-size: 1.8vw;
-  color: #b8b8b8;
-}
-.power-off span {
-  font-size: 3vw;
-  color: #9a9a9a;
-  letter-spacing: 4px;
-}
+.go-title { font-size: 5vw; color: #7a1010; letter-spacing: 6px; font-weight: 700; }
+.go-sub { font-size: 1.4vw; color: #7a7a7a; }
+.six-am .am-time { font-size: 6vw; color: #fff; letter-spacing: 6px; }
+.six-am .am-sub { font-size: 1.8vw; color: #b8b8b8; }
 .am-continue {
   margin-top: 2vw;
   font-family: inherit;
-  font-size: 1.6vw;
+  font-size: 1.5vw;
   color: #d8d8d8;
   background: #1c1c1c;
   border: 1px solid #555;
-  padding: 0.8vw 2vw;
+  padding: 0.7vw 1.8vw;
   cursor: pointer;
 }
-.am-continue:hover {
-  background: #2c2c2c;
-  color: #fff;
-}
+.am-continue:hover { background: #2c2c2c; color: #fff; }
+
+.anim-svg { display: block; }

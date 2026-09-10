@@ -8,7 +8,6 @@
 </head>
 <body>
   <div id="game">
-    <!-- Efecto de estatica global -->
     <canvas id="static"></canvas>
 
     <!-- ============ MENU PRINCIPAL ============ -->
@@ -24,13 +23,36 @@
         <button class="menu-item" data-action="continue" disabled>Continuar</button>
         <button class="menu-item" data-action="night6" disabled>Noche 6</button>
         <button class="menu-item" data-action="custom" disabled>Noche personalizada</button>
+        <button class="menu-item" data-action="roster">Elenco</button>
       </nav>
 
       <div class="menu-foot-left">
-        Fan project. Sin animatrónicos todavía.<br />
+        Fan project. Elenco original.<br />
         No afiliado con Scott Cawthon / Scott Games.
       </div>
-      <div class="menu-foot-right">v0.1</div>
+      <div class="menu-foot-right">v0.2</div>
+    </section>
+
+    <!-- ============ ELENCO ============ -->
+    <section id="scene-roster" class="scene">
+      <div class="roster-wrap">
+        <h2>Elenco</h2>
+        <div class="roster-grid" id="roster-grid"></div>
+        <button class="am-continue" id="btn-roster-back">Volver</button>
+      </div>
+    </section>
+
+    <!-- ============ NOCHE PERSONALIZADA ============ -->
+    <section id="scene-custom" class="scene">
+      <div class="custom-wrap">
+        <h2>Noche personalizada</h2>
+        <p class="custom-help">Nivel de IA de cada animatrónico (0&ndash;20).</p>
+        <div class="custom-sliders" id="custom-sliders"></div>
+        <div class="custom-actions">
+          <button class="am-continue" id="btn-custom-start">Empezar</button>
+          <button class="am-continue ghost" id="btn-custom-back">Volver</button>
+        </div>
+      </div>
     </section>
 
     <!-- ============ RECORTE DE PERIODICO ============ -->
@@ -58,18 +80,21 @@
       </div>
     </section>
 
-    <!-- ============ OFICINA (VACIA) ============ -->
+    <!-- ============ OFICINA ============ -->
     <section id="scene-office" class="scene">
       <div class="office-view" id="office-view">
         <div class="office-room">
           <div class="door door-left" id="door-left"></div>
           <div class="door door-right" id="door-right"></div>
+          <div class="anim-doorway left" id="anim-left"></div>
+          <div class="anim-doorway right" id="anim-right"></div>
+          <div class="office-anim" id="office-anim"></div>
           <div class="desk"></div>
-          <div class="poster">¡Celebra!</div>
+          <div class="poster" id="office-poster">¡Celebra!</div>
         </div>
+        <div class="blackout-face" id="blackout-face"></div>
       </div>
 
-      <!-- HUD -->
       <div class="hud">
         <div class="hud-time" id="hud-time">12&nbsp;a.m.</div>
         <div class="hud-night" id="hud-night">Noche 1</div>
@@ -79,18 +104,18 @@
         </div>
       </div>
 
-      <!-- Controles de puertas / luces -->
       <button class="ctrl ctrl-left-door" id="btn-left-door">Puerta</button>
       <button class="ctrl ctrl-left-light" id="btn-left-light">Luz</button>
       <button class="ctrl ctrl-right-door" id="btn-right-door">Puerta</button>
       <button class="ctrl ctrl-right-light" id="btn-right-light">Luz</button>
 
-      <!-- Pestaña de camaras -->
       <div class="cam-tab" id="cam-tab">CÁMARAS</div>
 
-      <!-- Panel de camaras -->
       <div class="cam-panel" id="cam-panel">
         <div class="cam-feed" id="cam-feed">
+          <div class="cam-anim" id="cam-anim"></div>
+          <div class="cam-disabled" id="cam-disabled">SEÑAL DE VÍDEO NO DISPONIBLE<br /><span>SÓLO AUDIO</span></div>
+          <div class="cove-stage" id="cove-stage"></div>
           <span class="cam-name" id="cam-name">CÁM 1A</span>
           <span class="cam-rec">● REC</span>
         </div>
@@ -98,25 +123,32 @@
       </div>
     </section>
 
-    <!-- ============ 6 A.M. / FIN DE NOCHE ============ -->
-    <section id="scene-6am" class="scene">
-      <div class="six-am">
-        <span class="am-time">6&nbsp;a.m.</span>
-        <span class="am-sub">Has sobrevivido la noche</span>
-        <button class="am-continue" id="btn-6am-continue">Continuar</button>
+    <!-- ============ JUMPSCARE ============ -->
+    <div id="jumpscare"><div class="js-sprite" id="js-sprite"></div></div>
+
+    <!-- ============ GAME OVER ============ -->
+    <section id="scene-gameover" class="scene">
+      <div class="gameover">
+        <span class="go-title">Game Over</span>
+        <span class="go-sub" id="go-sub"></span>
+        <button class="am-continue" id="btn-gameover-continue">Volver al menú</button>
       </div>
     </section>
 
-    <!-- ============ SIN ENERGIA ============ -->
-    <section id="scene-poweroff" class="scene">
-      <div class="power-off">
-        <span>Sin energía</span>
-        <button class="am-continue" id="btn-poweroff-continue">Volver al menú</button>
+    <!-- ============ 6 A.M. ============ -->
+    <section id="scene-6am" class="scene">
+      <div class="six-am">
+        <span class="am-time">6&nbsp;a.m.</span>
+        <span class="am-sub" id="am-sub">Has sobrevivido la noche</span>
+        <button class="am-continue" id="btn-6am-continue">Continuar</button>
       </div>
     </section>
   </div>
 
   <script src="js/static.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/characters.js"></script>
+  <script src="js/ai.js"></script>
   <script src="js/game.js"></script>
 </body>
 </html>
