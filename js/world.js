@@ -64,9 +64,8 @@
       },
       // Colocación del sprite en cada cámara (% del recuadro).
       // left/bottom = centro y separación desde el borde inferior.
-      // blend "screen" para los renders con fondo oscuro pegado.
       cameraLayout: {
-        "1B": { left: 61, bottom: 13, width: 30, blend: "screen" },
+        "1B": { left: 61, bottom: 13, width: 30 },
         "7": { left: 49, bottom: 8, width: 44 },
         "4A": { left: 53, bottom: 25, width: 22 },
         "4B": { left: 45, bottom: 2, width: 58 },

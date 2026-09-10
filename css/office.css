@@ -19,7 +19,7 @@
 
 #scene-office.blackout .office-layers { filter: brightness(0.05) contrast(1.4); }
 
-/* personaje asomado a la puerta (el render trae fondo oscuro pegado) */
+/* personaje asomado a la puerta (el sprite ya trae canal alfa recortado) */
 .dogo-door-sprite {
   position: absolute;
   z-index: 3;
@@ -30,7 +30,6 @@
   object-fit: contain;
   object-position: right bottom;
   display: none;
-  mix-blend-mode: screen;
   filter: brightness(0.85) contrast(1.1);
   pointer-events: none;
 }
