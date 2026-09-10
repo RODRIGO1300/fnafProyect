@@ -48,8 +48,15 @@
       accent: "#342016",
       belly: "#c49361",
       rosterImage: DOGO + "dogo-elenco.webp",
+      // En el escenario (1A) Dogo va pegado en la foto de la cámara: hay
+      // una versión con él y otra sin él (quedan el gato y el mapache).
+      stage: "1A",
+      stageBackgrounds: {
+        present: "assets/escenarios/cam-1a-escenario-elenco.webp",
+        absent: "assets/escenarios/cam-1a-escenario-sin-dogo.webp",
+      },
+      // Sprite recortado para el resto de salas.
       cameraSprites: {
-        "1A": DOGO + "sprites/camaras/cam-1a.webp",
         "1B": DOGO + "sprites/camaras/cam-1b.webp",
         "7": DOGO + "sprites/camaras/cam-7.webp",
         "4A": DOGO + "sprites/camaras/cam-4a.webp",
@@ -59,7 +66,6 @@
       // left/bottom = centro y separación desde el borde inferior.
       // blend "screen" para los renders con fondo oscuro pegado.
       cameraLayout: {
-        "1A": { left: 58, bottom: 41, width: 23, blend: "screen" },
         "1B": { left: 61, bottom: 13, width: 30, blend: "screen" },
         "7": { left: 49, bottom: 8, width: 44 },
         "4A": { left: 53, bottom: 25, width: 22 },

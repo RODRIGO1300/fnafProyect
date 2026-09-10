@@ -66,6 +66,9 @@
       if (a.cameraSprites) {
         for (var cam in a.cameraSprites) urls.push(a.cameraSprites[cam]);
       }
+      if (a.stageBackgrounds) {
+        for (var s in a.stageBackgrounds) urls.push(a.stageBackgrounds[s]);
+      }
     }
     preload(urls);
   }

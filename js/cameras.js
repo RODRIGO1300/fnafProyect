@@ -2,6 +2,10 @@
    Five Nights at Freddy's - clon
    CÁMARAS: monitor (abrir/cerrar), mapa, selección de sala, fondo de
    cada cámara y sprite del personaje colocado según su cameraLayout.
+
+   Escenario (1A): el fondo cambia según si Dogo sigue ahí (foto con
+   el trío) o ya se marchó (foto sin él). En el resto de salas se
+   superpone su sprite recortado.
    ================================================================ */
 (function () {
   "use strict";
@@ -17,6 +21,7 @@
 
   var camDownSince = 0; // performance.now() al bajar el monitor
   var lastSig = "";
+  var lastBg = "";
 
   /* ---------------- Mapa ---------------- */
   function buildMap() {
@@ -48,26 +53,53 @@
     Sound.camStatic();
   }
 
+  function camById(id) {
+    for (var i = 0; i < W.CAMS.length; i++) if (W.CAMS[i].id === id) return W.CAMS[i];
+    return null;
+  }
+
+  /* ---------------- Fondo del feed (dinámico en el escenario) --------- */
+  // Devuelve la URL de fondo para una cámara. Si es el escenario de un
+  // personaje, elige la versión con/sin él según siga o no en la sala.
+  function backgroundFor(camId) {
+    var cam = camById(camId);
+    var base = (cam && cam.background) || "";
+
+    var ai = FNAF.night.ai();
+    for (var i = 0; i < W.ROSTER.length; i++) {
+      var def = W.ANIMATRONICS[W.ROSTER[i]];
+      if (!def || def.stage !== camId || !def.stageBackgrounds) continue;
+      var here =
+        !!ai &&
+        ai.presenceInCam(camId).some(function (e) {
+          return e.id === def.id;
+        });
+      var sb = def.stageBackgrounds;
+      return here ? sb.present : sb.absent || base;
+    }
+    return base;
+  }
+
+  function applyFeedBackground(force) {
+    var url = backgroundFor(state.currentCam);
+    if (!force && url === lastBg) return;
+    lastBg = url;
+    $("cam-feed").style.backgroundImage = url
+      ? 'linear-gradient(rgba(0,8,4,0.16), rgba(0,0,0,0.34)), url("' + url + '")'
+      : "linear-gradient(#15130f, #000)";
+  }
+
   /* ---------------- Selección de cámara ---------------- */
   function selectCam(id) {
     state.currentCam = id;
     var cam = camById(id);
     $("cam-name").textContent = "CÁM " + id + " — " + (cam ? cam.name : "");
     $("cam-disabled").classList.toggle("show", !!(cam && cam.audioOnly));
-    $("cam-feed").style.backgroundImage =
-      cam && cam.background
-        ? 'linear-gradient(rgba(0,8,4,0.16), rgba(0,0,0,0.34)), url("' +
-          cam.background +
-          '")'
-        : "linear-gradient(#15130f, #000)";
     FNAF.qsa("#cam-map .cam-btn").forEach(function (b) {
       b.classList.toggle("active", b.dataset.id === id);
     });
+    applyFeedBackground(true);
     render(true);
-  }
-  function camById(id) {
-    for (var i = 0; i < W.CAMS.length; i++) if (W.CAMS[i].id === id) return W.CAMS[i];
-    return null;
   }
 
   /* ---------------- Abrir / cerrar monitor ---------------- */
@@ -99,8 +131,11 @@
     }
   });
 
-  /* ---------------- Pintado del personaje en la cámara ---------------- */
+  /* ---------------- Pintado ---------------- */
   function render(force) {
+    // el fondo se revisa siempre (barato: comparación de cadena)
+    applyFeedBackground(force);
+
     var ai = FNAF.night.ai();
     var def = W.ANIMATRONICS.dogo;
     var present =
@@ -138,6 +173,7 @@
   FNAF.bus.on("night:start", function () {
     camDownSince = performance.now();
     lastSig = "";
+    lastBg = "";
     $("cam-panel").classList.remove("open");
     scenes.el("office").classList.remove("cams-open");
     buildMap();
