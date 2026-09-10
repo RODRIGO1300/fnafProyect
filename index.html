@@ -9,48 +9,67 @@
 <body>
   <div id="game">
     <canvas id="static"></canvas>
+    <div class="vignette"></div>
 
     <!-- ============ MENU PRINCIPAL ============ -->
     <section id="scene-menu" class="scene active">
+      <button class="sound-toggle" id="sound-toggle" title="Sonido">&#128266;</button>
+
       <div class="menu-title">
         <span class="line small">Five Nights at</span>
         <span class="line big">Freddy's</span>
         <span class="subtitle">clon &mdash; proyecto de práctica</span>
+        <span class="menu-stars" id="menu-stars"></span>
       </div>
 
       <nav class="menu-list" id="menu-list">
         <button class="menu-item" data-action="new">Nueva partida</button>
         <button class="menu-item" data-action="continue" disabled>Continuar</button>
         <button class="menu-item" data-action="night6" disabled>Noche 6</button>
-        <button class="menu-item" data-action="custom" disabled>Noche personalizada</button>
+        <button class="menu-item" data-action="custom">Noche personalizada</button>
         <button class="menu-item" data-action="roster">Elenco</button>
       </nav>
 
       <div class="menu-foot-left">
-        Fan project. Elenco original.<br />
-        No afiliado con Scott Cawthon / Scott Games.
+        Fan project.<br />No afiliado con Scott Cawthon / Scott Games.
       </div>
-      <div class="menu-foot-right">v0.2</div>
+      <div class="menu-foot-right">v0.3</div>
     </section>
 
     <!-- ============ ELENCO ============ -->
     <section id="scene-roster" class="scene">
-      <div class="roster-wrap">
+      <div class="panel-screen">
         <h2>Elenco</h2>
+        <p class="panel-note">
+          El elenco definitivo está en rediseño. De momento sólo hay un
+          personaje reservado.
+        </p>
         <div class="roster-grid" id="roster-grid"></div>
-        <button class="am-continue" id="btn-roster-back">Volver</button>
+        <button class="btn" id="btn-roster-back">Volver</button>
       </div>
     </section>
 
     <!-- ============ NOCHE PERSONALIZADA ============ -->
     <section id="scene-custom" class="scene">
-      <div class="custom-wrap">
+      <div class="panel-screen">
         <h2>Noche personalizada</h2>
-        <p class="custom-help">Nivel de IA de cada animatrónico (0&ndash;20).</p>
-        <div class="custom-sliders" id="custom-sliders"></div>
-        <div class="custom-actions">
-          <button class="am-continue" id="btn-custom-start">Empezar</button>
-          <button class="am-continue ghost" id="btn-custom-back">Volver</button>
+        <p class="panel-note">Ajusta el nivel de IA de cada animatrónico (0&ndash;20).</p>
+
+        <div class="custom-presets" id="custom-presets">
+          <button class="chip" data-preset="0">Todo a 0</button>
+          <button class="chip" data-preset="10">Todo a 10</button>
+          <button class="chip" data-preset="20">Máximo (4/20)</button>
+        </div>
+
+        <div class="custom-list" id="custom-list"></div>
+
+        <p class="custom-locked" id="custom-locked">
+          &#128274; La noche personalizada aún no se puede iniciar.
+        </p>
+
+        <div class="panel-actions">
+          <button class="btn primary" id="btn-custom-start" disabled>Empezar</button>
+          <button class="btn" id="btn-custom-back">Volver</button>
         </div>
       </div>
     </section>
@@ -76,6 +95,7 @@
     <!-- ============ INTRO DE NOCHE ============ -->
     <section id="scene-nightintro" class="scene">
       <div class="night-intro">
+        <span class="night-clock" id="night-clock">12:00 AM</span>
         <span class="night-label" id="night-label">Noche 1</span>
       </div>
     </section>
@@ -84,23 +104,27 @@
     <section id="scene-office" class="scene">
       <div class="office-view" id="office-view">
         <div class="office-room">
-          <div class="door door-left" id="door-left"></div>
-          <div class="door door-right" id="door-right"></div>
-          <div class="anim-doorway left" id="anim-left"></div>
-          <div class="anim-doorway right" id="anim-right"></div>
-          <div class="office-anim" id="office-anim"></div>
-          <div class="desk"></div>
-          <div class="poster" id="office-poster">¡Celebra!</div>
+          <div class="wall-light"></div>
+          <div class="door door-left" id="door-left"><span class="door-slats"></span></div>
+          <div class="door door-right" id="door-right"><span class="door-slats"></span></div>
+          <div class="hall hall-left" id="hall-left"></div>
+          <div class="hall hall-right" id="hall-right"></div>
+          <div class="poster" id="office-poster">
+            <span>¡Celebra!</span>
+          </div>
+          <div class="desk">
+            <div class="desk-fan"><span class="fan-blades"></span></div>
+            <div class="desk-tablet"></div>
+          </div>
         </div>
-        <div class="blackout-face" id="blackout-face"></div>
       </div>
 
       <div class="hud">
-        <div class="hud-time" id="hud-time">12&nbsp;a.m.</div>
+        <div class="hud-time" id="hud-time">12&nbsp;AM</div>
         <div class="hud-night" id="hud-night">Noche 1</div>
         <div class="hud-power">
-          Energía: <span id="power-value">100</span>%
-          <span class="usage" id="power-usage">&#9632;</span>
+          <div class="pw-line">Energía: <span id="power-value">100</span>%</div>
+          <div class="pw-line">Uso: <span class="usage" id="power-usage">&#9632;</span></div>
         </div>
       </div>
 
@@ -109,38 +133,43 @@
       <button class="ctrl ctrl-right-door" id="btn-right-door">Puerta</button>
       <button class="ctrl ctrl-right-light" id="btn-right-light">Luz</button>
 
-      <div class="cam-tab" id="cam-tab">CÁMARAS</div>
+      <div class="cam-tab" id="cam-tab"><span>CÁMARAS</span></div>
 
       <div class="cam-panel" id="cam-panel">
         <div class="cam-feed" id="cam-feed">
-          <div class="cam-anim" id="cam-anim"></div>
-          <div class="cam-disabled" id="cam-disabled">SEÑAL DE VÍDEO NO DISPONIBLE<br /><span>SÓLO AUDIO</span></div>
-          <div class="cove-stage" id="cove-stage"></div>
+          <div class="cam-glitch" id="cam-glitch"></div>
+          <div class="cam-disabled" id="cam-disabled">
+            SEÑAL DE VÍDEO NO DISPONIBLE<br /><span>SÓLO AUDIO</span>
+          </div>
           <span class="cam-name" id="cam-name">CÁM 1A</span>
-          <span class="cam-rec">● REC</span>
+          <span class="cam-rec">&#9679; REC</span>
+          <span class="cam-clock" id="cam-clock">12 AM</span>
         </div>
-        <div class="cam-map" id="cam-map"></div>
+        <div class="cam-map" id="cam-map">
+          <span class="map-office">OFICINA</span>
+        </div>
       </div>
     </section>
 
-    <!-- ============ JUMPSCARE ============ -->
+    <!-- ============ JUMPSCARE (reservado) ============ -->
     <div id="jumpscare"><div class="js-sprite" id="js-sprite"></div></div>
 
     <!-- ============ GAME OVER ============ -->
     <section id="scene-gameover" class="scene">
-      <div class="gameover">
+      <div class="endcard">
         <span class="go-title">Game Over</span>
         <span class="go-sub" id="go-sub"></span>
-        <button class="am-continue" id="btn-gameover-continue">Volver al menú</button>
+        <button class="btn" id="btn-gameover-continue">Volver al menú</button>
       </div>
     </section>
 
     <!-- ============ 6 A.M. ============ -->
     <section id="scene-6am" class="scene">
-      <div class="six-am">
-        <span class="am-time">6&nbsp;a.m.</span>
+      <div class="endcard">
+        <span class="am-time">6&nbsp;AM</span>
         <span class="am-sub" id="am-sub">Has sobrevivido la noche</span>
-        <button class="am-continue" id="btn-6am-continue">Continuar</button>
+        <span class="menu-stars" id="am-stars"></span>
+        <button class="btn primary" id="btn-6am-continue">Continuar</button>
       </div>
     </section>
   </div>

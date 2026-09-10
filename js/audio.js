@@ -137,6 +137,16 @@
       for (var i = 0; i < 10; i++) burst(t + i * 0.07, 0.06, "bandpass", 500 + i * 40, 0.3);
     },
 
+    // ráfaga de estática al cambiar de cámara
+    camStatic: function () {
+      if (!enabled) return;
+      resume();
+      if (!ctx) return;
+      var t = now();
+      burst(t, 0.22, "highpass", 1600, 0.28);
+      burst(t, 0.22, "bandpass", 700, 0.12);
+    },
+
     // cámara arriba/abajo
     camToggle: function (up) {
       if (!enabled) return;

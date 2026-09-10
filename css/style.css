@@ -2,15 +2,9 @@
    Five Nights at Freddy's - clon
    ================================================================ */
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  user-select: none;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
 
-html,
-body {
+html, body {
   width: 100%;
   height: 100%;
   background: #000;
@@ -42,27 +36,52 @@ body {
   opacity: 0.06;
   mix-blend-mode: screen;
 }
-
-.scene {
+.vignette {
   position: absolute;
   inset: 0;
-  display: none;
-  animation: fade-in 0.4s ease;
+  z-index: 890;
+  pointer-events: none;
+  box-shadow: inset 0 0 18vw 6vw rgba(0, 0, 0, 0.75);
 }
-.scene.active {
-  display: block;
+
+.scene { position: absolute; inset: 0; display: none; }
+.scene.active { display: block; animation: fade-in 0.4s ease; }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* ---------- botones genéricos ---------- */
+.btn {
+  font-family: inherit;
+  font-size: 1.4vw;
+  color: #d8d8d8;
+  background: #1b1b1b;
+  border: 1px solid #4a4a4a;
+  padding: 0.7vw 1.8vw;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
 }
-@keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
+.btn:hover:not([disabled]) { background: #2c2c2c; color: #fff; }
+.btn.primary { border-color: #7a7a7a; }
+.btn[disabled] { color: #4a4a4a; border-color: #2a2a2a; cursor: default; }
 
 /* ================================================================
    MENU
    ================================================================ */
-#scene-menu {
-  background: radial-gradient(circle at 60% 40%, #1a1015 0%, #050505 75%);
+#scene-menu { background: radial-gradient(circle at 62% 42%, #1c1116 0%, #050505 72%); }
+
+.sound-toggle {
+  position: absolute;
+  top: 2.5%;
+  right: 3%;
+  z-index: 10;
+  background: none;
+  border: 1px solid #3a3a3a;
+  color: #9a9a9a;
+  font-size: 1.6vw;
+  padding: 0.3vw 0.6vw;
+  cursor: pointer;
 }
+.sound-toggle.off { color: #4a4a4a; }
+
 .menu-title {
   position: absolute;
   top: 7%;
@@ -73,41 +92,36 @@ body {
   filter: drop-shadow(0 0 12px rgba(120, 0, 0, 0.35));
   animation: title-jitter 4s steps(1) infinite;
 }
-.menu-title .line {
-  font-weight: 700;
-  color: #e6e6e6;
-  letter-spacing: 1px;
-}
+.menu-title .line { font-weight: 700; color: #e6e6e6; letter-spacing: 1px; }
 .menu-title .small { font-size: 3.2vw; margin-left: 0.3vw; }
 .menu-title .big {
   font-size: 9vw;
   margin-top: -0.5vw;
   text-shadow: 3px 0 rgba(255, 0, 40, 0.35), -3px 0 rgba(0, 200, 255, 0.25);
 }
-.menu-title .subtitle {
-  font-size: 1.5vw;
-  color: #6a6a6a;
-  margin-top: 1vw;
-  letter-spacing: 2px;
-}
+.menu-title .subtitle { font-size: 1.5vw; color: #6a6a6a; margin-top: 1vw; letter-spacing: 2px; }
 @keyframes title-jitter {
   0%, 97%, 100% { transform: translate(0, 0); }
   97.5% { transform: translate(-2px, 1px); }
   98.5% { transform: translate(3px, -1px); }
 }
+
+.menu-stars { margin-top: 1vw; font-size: 1.8vw; letter-spacing: 3px; color: #f0c419; min-height: 1.8vw; }
+.menu-stars .dim { color: #3a3a3a; }
+
 .menu-list {
   position: absolute;
   left: 7%;
-  bottom: 12%;
+  bottom: 11%;
   display: flex;
   flex-direction: column;
-  gap: 1.1vw;
+  gap: 1vw;
 }
 .menu-item {
   background: none;
   border: none;
   font-family: inherit;
-  font-size: 2.4vw;
+  font-size: 2.3vw;
   color: #8c8c8c;
   text-align: left;
   cursor: pointer;
@@ -120,88 +134,107 @@ body {
   text-shadow: 2px 0 rgba(255, 0, 40, 0.5), -2px 0 rgba(0, 200, 255, 0.4);
 }
 .menu-item[disabled] { color: #3d3d3d; cursor: default; }
-.menu-foot-left {
+
+.menu-foot-left, .menu-foot-right {
   position: absolute;
-  left: 2%;
   bottom: 2%;
-  font-size: 1.1vw;
+  font-size: 1.05vw;
   color: #4c4c4c;
   line-height: 1.5;
 }
-.menu-foot-right {
-  position: absolute;
-  right: 2%;
-  bottom: 2%;
-  font-size: 1.1vw;
-  color: #4c4c4c;
-}
+.menu-foot-left { left: 2%; }
+.menu-foot-right { right: 2%; }
 
 /* ================================================================
-   ELENCO
+   PANTALLAS DE PANEL (elenco / noche personalizada)
    ================================================================ */
-#scene-roster { background: radial-gradient(circle at 50% 30%, #15100f, #050505 75%); overflow-y: auto; }
-.roster-wrap {
+#scene-roster, #scene-custom {
+  background: radial-gradient(circle at 50% 25%, #16100f, #050505 75%);
+}
+.panel-screen {
   position: absolute;
   inset: 0;
-  padding: 3% 5% 5%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2vw;
+  gap: 1.4vw;
+  padding: 3% 6%;
   overflow-y: auto;
 }
-.roster-wrap h2 { font-size: 3vw; color: #e6e6e6; letter-spacing: 3px; }
+.panel-screen h2 { font-size: 3vw; color: #e8e8e8; letter-spacing: 3px; }
+.panel-note { font-size: 1.2vw; color: #8a8a8a; text-align: center; max-width: 70%; }
+.panel-actions { display: flex; gap: 1vw; margin-top: 1vw; }
+
+/* elenco */
 .roster-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 340px));
   gap: 1.6vw;
+  justify-content: center;
   width: 100%;
 }
 .roster-card {
-  background: rgba(15, 15, 18, 0.85);
-  border: 1px solid #3a3a3a;
+  background: rgba(16, 16, 20, 0.9);
+  border: 1px solid #383838;
   padding: 1.2vw;
   display: flex;
   gap: 1vw;
 }
 .roster-card .art {
-  width: 34%;
+  width: 38%;
   min-width: 90px;
-  background: radial-gradient(circle at 50% 35%, #241a17, #0a0807);
+  background: radial-gradient(circle at 50% 30%, #20242b, #0a0b0d);
   border: 1px solid #333;
   display: flex;
   align-items: flex-end;
   justify-content: center;
 }
-.roster-card .art svg { width: 100%; height: auto; }
-.roster-card .info { flex: 1; }
+.roster-card .art svg { width: 100%; height: auto; opacity: 0.9; }
 .roster-card .info h3 { font-size: 1.5vw; color: #fff; }
-.roster-card .info .role { font-size: 1vw; color: #b06; margin-bottom: 0.5vw; letter-spacing: 1px; }
-.roster-card .info p { font-size: 0.95vw; line-height: 1.45; color: #b8b8b8; margin-bottom: 0.5vw; }
-.roster-card .info .counter { color: #7fd08a; }
-
-/* ================================================================
-   NOCHE PERSONALIZADA
-   ================================================================ */
-#scene-custom { background: radial-gradient(circle at 50% 30%, #15100f, #050505 75%); }
-.custom-wrap {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1.5vw;
+.roster-card .info .role { font-size: 1vw; color: #b6b6b6; margin-bottom: 0.5vw; letter-spacing: 1px; }
+.roster-card .info p { font-size: 0.95vw; line-height: 1.45; color: #9c9c9c; margin-bottom: 0.5vw; }
+.roster-card .badge {
+  display: inline-block;
+  font-size: 0.85vw;
+  padding: 0.15vw 0.6vw;
+  border: 1px solid #6a5;
+  color: #9c7;
+  letter-spacing: 1px;
 }
-.custom-wrap h2 { font-size: 3vw; color: #e6e6e6; letter-spacing: 3px; }
-.custom-help { font-size: 1.2vw; color: #888; }
-.custom-sliders { display: flex; flex-direction: column; gap: 1vw; width: 46%; }
-.custom-row { display: flex; align-items: center; gap: 1vw; font-size: 1.3vw; }
-.custom-row .cname { width: 30%; color: #ddd; }
-.custom-row input[type="range"] { flex: 1; }
-.custom-row .cval { width: 2.5vw; text-align: right; color: #fff; }
-.custom-actions { display: flex; gap: 1vw; margin-top: 1vw; }
-.am-continue.ghost { background: transparent; }
+
+/* noche personalizada */
+.custom-presets { display: flex; gap: 0.8vw; }
+.chip {
+  font-family: inherit;
+  font-size: 1vw;
+  color: #cfcfcf;
+  background: #202020;
+  border: 1px solid #4a4a4a;
+  padding: 0.4vw 1vw;
+  cursor: pointer;
+}
+.chip:hover { background: #2e2e2e; }
+.custom-list { display: flex; flex-direction: column; gap: 0.9vw; width: 54%; min-width: 320px; }
+.custom-row {
+  display: flex;
+  align-items: center;
+  gap: 1vw;
+  background: rgba(16, 16, 20, 0.8);
+  border: 1px solid #333;
+  padding: 0.7vw 1vw;
+}
+.custom-row .cface { width: 3vw; min-width: 34px; }
+.custom-row .cface svg { width: 100%; height: auto; }
+.custom-row .cname { flex: 1; font-size: 1.3vw; color: #ddd; }
+.custom-row input[type="range"] { flex: 2; accent-color: #b03636; }
+.custom-row .cval {
+  width: 2.4vw;
+  min-width: 28px;
+  text-align: right;
+  font-size: 1.3vw;
+  color: #fff;
+}
+.custom-locked { font-size: 1.15vw; color: #c98; letter-spacing: 1px; }
 
 /* ================================================================
    PERIODICO
@@ -222,26 +255,14 @@ body {
   filter: sepia(0.35) contrast(1.05);
   cursor: pointer;
 }
-.newspaper h1 {
-  font-size: 5vw;
-  text-align: center;
-  letter-spacing: 4px;
-  border-bottom: 3px double #17140f;
-  padding-bottom: 1vw;
-}
+.newspaper h1 { font-size: 5vw; text-align: center; letter-spacing: 4px; border-bottom: 3px double #17140f; padding-bottom: 1vw; }
 .newspaper .lead { font-size: 2.6vw; font-weight: 700; text-align: center; margin: 1.5vw 0; }
 .newspaper p { font-size: 1.7vw; line-height: 1.5; margin-bottom: 1vw; text-align: justify; }
 .newspaper .pay { font-size: 2.2vw; font-weight: 700; text-align: center; }
 .newspaper .small { font-size: 1.2vw; font-style: italic; color: #443; }
 .newspaper .hint {
-  position: absolute;
-  bottom: 3%;
-  left: 0;
-  width: 100%;
-  text-align: center;
-  font-family: Consolas, monospace;
-  font-size: 1.2vw;
-  color: #665;
+  position: absolute; bottom: 3%; left: 0; width: 100%; text-align: center;
+  font-family: Consolas, monospace; font-size: 1.2vw; color: #665;
   animation: blink 1s steps(1) infinite;
 }
 @keyframes blink { 50% { opacity: 0.2; } }
@@ -251,22 +272,15 @@ body {
    ================================================================ */
 #scene-nightintro { background: #000; }
 .night-intro {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.night-label {
-  font-size: 4vw;
-  color: #e6e6e6;
-  letter-spacing: 4px;
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 1vw;
   animation: night-fade 3s ease forwards;
 }
+.night-clock { font-size: 2vw; color: #8a8a8a; letter-spacing: 3px; }
+.night-label { font-size: 4vw; color: #e6e6e6; letter-spacing: 4px; }
 @keyframes night-fade {
-  0% { opacity: 0; }
-  25%, 70% { opacity: 1; }
-  100% { opacity: 0; }
+  0% { opacity: 0; } 25%, 70% { opacity: 1; } 100% { opacity: 0; }
 }
 
 /* ================================================================
@@ -275,295 +289,214 @@ body {
 #scene-office { background: #000; }
 .office-view { position: absolute; inset: 0; overflow: hidden; }
 .office-room {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(#241b16 0%, #0c0908 60%, #050403 100%);
-  transition: filter 0.3s;
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 120%, rgba(120, 90, 60, 0.25), transparent 60%),
+    linear-gradient(#2a201a 0%, #120d0a 55%, #060403 100%);
+  transition: filter 0.4s;
 }
-#scene-office.blackout .office-room { filter: brightness(0.06); }
+.wall-light {
+  position: absolute; left: 25%; right: 25%; top: 0; height: 55%;
+  background: radial-gradient(ellipse at 50% 0%, rgba(255, 210, 150, 0.10), transparent 70%);
+  pointer-events: none;
+}
+#scene-office.blackout .office-room { filter: brightness(0.05) contrast(1.4); }
+#scene-office.blackout .wall-light { display: none; }
+
 .office-room .desk {
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  width: 46%;
-  height: 26%;
+  position: absolute; left: 50%; bottom: 0; width: 52%; height: 27%;
   transform: translateX(-50%);
-  background: linear-gradient(#3a2b20, #1c130d);
+  background: linear-gradient(#3a2b20, #180f0a);
   border-top: 3px solid #4c3a2c;
-  border-radius: 40% 40% 0 0 / 30% 30% 0 0;
+  border-radius: 42% 42% 0 0 / 32% 32% 0 0;
 }
+.desk-fan {
+  position: absolute; left: 14%; top: -32%; width: 16%; aspect-ratio: 1;
+}
+.desk-fan .fan-blades {
+  position: absolute; inset: 0; border-radius: 50%;
+  background: conic-gradient(#5a5a5a 0 25%, #2a2a2a 0 50%, #5a5a5a 0 75%, #2a2a2a 0);
+  animation: spin 0.12s linear infinite;
+  box-shadow: 0 0 0 3px #333, inset 0 0 12px #000;
+}
+.desk-fan::after {
+  content: ""; position: absolute; left: 46%; bottom: -60%; width: 8%; height: 70%;
+  background: #333;
+}
+#scene-office.blackout .fan-blades { animation-play-state: paused; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.desk-tablet {
+  position: absolute; right: 16%; top: -8%; width: 22%; height: 46%;
+  background: linear-gradient(#101010, #1c1c1c);
+  border: 2px solid #333; border-radius: 3px;
+}
+
 .office-room .poster {
-  position: absolute;
-  left: 50%;
-  top: 20%;
-  transform: translateX(-50%) rotate(-2deg);
-  width: 13%;
-  aspect-ratio: 3 / 4;
-  background: #6d1414;
-  color: #ffd24a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2vw;
-  text-align: center;
-  border: 4px solid #2a0d0d;
+  position: absolute; left: 50%; top: 17%; transform: translateX(-50%) rotate(-2deg);
+  width: 12%; aspect-ratio: 3 / 4;
+  background: #6d1414; color: #ffd24a;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1vw; text-align: center; border: 4px solid #2a0d0d;
 }
-.office-room .poster.golden {
-  background: #000;
-  border-color: #000;
-  padding: 4%;
-}
-.office-room .poster.golden svg { width: 100%; height: 100%; }
+
 .office-room .door {
-  position: absolute;
-  top: 0;
-  width: 15%;
-  height: 100%;
-  background: linear-gradient(#1b1512, #0a0706);
+  position: absolute; top: 0; width: 16%; height: 100%;
+  background: linear-gradient(#1c1512, #0a0706);
 }
-.office-room .door-left { left: 0; box-shadow: inset -20px 0 40px #000; }
-.office-room .door-right { right: 0; box-shadow: inset 20px 0 40px #000; }
-.office-room .door.closed {
-  background: #2b2b2b;
-  background-image: repeating-linear-gradient(#232323 0 12px, #161616 12px 24px);
+.office-room .door-left { left: 0; box-shadow: inset -22px 0 44px #000; }
+.office-room .door-right { right: 0; box-shadow: inset 22px 0 44px #000; }
+.door .door-slats {
+  position: absolute; inset: 0; opacity: 0;
+  background: repeating-linear-gradient(#242424 0 14px, #141414 14px 28px);
+  transition: opacity 0.12s;
 }
-.office-room .door.lit { background: linear-gradient(#3a322c, #201a15); }
+.office-room .door.closed .door-slats { opacity: 1; }
+.office-room .door.lit { background: linear-gradient(#3c342d, #221b15); }
 
-/* animatrónico en el hueco de una puerta (visible con la luz) */
-.anim-doorway {
-  position: absolute;
-  top: 12%;
-  height: 82%;
-  width: 15%;
-  display: none;
-  align-items: flex-end;
-  justify-content: center;
-  z-index: 3;
-  filter: brightness(0.85) contrast(1.1);
-}
-.anim-doorway.left { left: 0; }
-.anim-doorway.right { right: 0; }
-.anim-doorway.show { display: flex; }
-.anim-doorway svg { height: 100%; width: auto; }
-
-/* animatrónico dentro de la oficina */
-.office-anim {
-  position: absolute;
-  right: 6%;
-  bottom: 0;
-  height: 78%;
-  display: none;
-  z-index: 4;
-  filter: brightness(0.5);
-}
-.office-anim.show { display: block; }
-.office-anim svg { height: 100%; width: auto; }
-
-/* cara de Bruno en el apagón */
-.blackout-face {
-  position: absolute;
-  left: 0;
-  top: 15%;
-  width: 26%;
-  height: 70%;
-  display: none;
-  z-index: 6;
-}
-#scene-office.blackout .blackout-face.show {
-  display: block;
-  animation: blackout-flicker 0.18s steps(1) infinite;
-}
-.blackout-face svg { height: 100%; width: auto; filter: brightness(1.2); }
-@keyframes blackout-flicker {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.15; }
-}
+.hall { position: absolute; top: 8%; height: 84%; width: 16%; pointer-events: none; opacity: 0; transition: opacity 0.1s; }
+.hall-left { left: 0; background: linear-gradient(90deg, rgba(255,220,170,0.16), transparent); }
+.hall-right { right: 0; background: linear-gradient(270deg, rgba(255,220,170,0.16), transparent); }
+.hall.on { opacity: 1; }
 
 /* HUD */
-.hud { position: absolute; z-index: 500; pointer-events: none; }
-.hud-time { position: absolute; top: 3%; right: 4%; font-size: 2.6vw; color: #fff; }
-.hud-night { position: absolute; top: 9%; right: 4%; font-size: 1.4vw; color: #cfcfcf; }
-.hud-power { position: absolute; bottom: 4%; left: 4%; font-size: 1.6vw; color: #fff; }
-.hud-power .usage { margin-left: 0.4vw; letter-spacing: -2px; }
+.hud { position: absolute; z-index: 500; pointer-events: none; inset: 0; }
+.hud-time {
+  position: absolute; top: 3%; right: 4%; font-size: 2.6vw; color: #fff;
+}
+.hud-time.tick { animation: tick 0.5s ease; }
+@keyframes tick { 0% { transform: scale(1.25); color: #ffd24a; } 100% { transform: scale(1); } }
+.hud-night { position: absolute; top: 9.5%; right: 4%; font-size: 1.3vw; color: #cfcfcf; }
+.hud-power { position: absolute; bottom: 4%; left: 4%; font-size: 1.5vw; color: #fff; line-height: 1.5; }
+.hud-power .usage { letter-spacing: -2px; }
 
 /* controles */
 .ctrl {
-  position: absolute;
-  z-index: 500;
-  font-family: inherit;
-  font-size: 1vw;
-  padding: 0.5vw 1vw;
-  color: #d8d8d8;
-  background: #1c1c1c;
-  border: 1px solid #444;
-  cursor: pointer;
+  position: absolute; z-index: 500; font-family: inherit; font-size: 1vw;
+  padding: 0.5vw 1vw; color: #d8d8d8; background: #1c1c1c; border: 1px solid #444; cursor: pointer;
 }
 .ctrl:hover { background: #2c2c2c; }
 .ctrl.active { background: #d8d8d8; color: #111; }
-.ctrl-left-door { left: 17%; bottom: 30%; }
-.ctrl-left-light { left: 17%; bottom: 24%; }
-.ctrl-right-door { right: 17%; bottom: 30%; }
-.ctrl-right-light { right: 17%; bottom: 24%; }
+.ctrl-left-door { left: 15%; bottom: 32%; }
+.ctrl-left-light { left: 15%; bottom: 25%; }
+.ctrl-right-door { right: 15%; bottom: 32%; }
+.ctrl-right-light { right: 15%; bottom: 25%; }
 
 /* pestaña de cámaras */
 .cam-tab {
-  position: absolute;
-  z-index: 500;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 30%;
-  text-align: center;
-  padding: 0.5vw 0;
-  font-size: 1.2vw;
-  letter-spacing: 3px;
-  background: rgba(20, 20, 20, 0.85);
-  border: 1px solid #444;
-  border-bottom: none;
-  cursor: pointer;
+  position: absolute; z-index: 500; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 32%; text-align: center; padding: 0.4vw 0; cursor: pointer;
+  background: rgba(18, 18, 18, 0.85); border: 1px solid #444; border-bottom: none;
 }
+.cam-tab span { font-size: 1.1vw; letter-spacing: 4px; opacity: 0.7; }
 .cam-tab:hover { background: rgba(45, 45, 45, 0.95); }
+.cam-tab::before {
+  content: ""; position: absolute; left: 50%; top: -6px; transform: translateX(-50%);
+  border: 6px solid transparent; border-bottom-color: #777;
+}
 
 /* panel de cámaras */
-.cam-panel {
-  position: absolute;
-  inset: 0;
-  z-index: 600;
-  background: #000;
-  display: none;
-  animation: fade-in 0.15s ease;
+.cam-panel { position: absolute; inset: 0; z-index: 600; background: #000; display: none; }
+.cam-panel.open { display: block; animation: fade-in 0.12s ease; }
+.cam-feed {
+  position: absolute; inset: 0; overflow: hidden;
+  background:
+    repeating-linear-gradient(115deg, rgba(255,255,255,0.02) 0 3px, transparent 3px 7px),
+    linear-gradient(#1a1712, #050403);
 }
-.cam-panel.open { display: block; }
-.cam-feed { position: absolute; inset: 0; background: linear-gradient(#15130f, #000); overflow: hidden; }
 .cam-feed::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(rgba(255, 255, 255, 0.03) 0 2px, transparent 2px 4px);
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(rgba(255,255,255,0.035) 0 2px, transparent 2px 4px);
   animation: scan 6s linear infinite;
-  pointer-events: none;
 }
-@keyframes scan { to { background-position: 0 200px; } }
-.cam-name { position: absolute; top: 4%; left: 4%; font-size: 2vw; color: #fff; z-index: 2; }
-.cam-rec { position: absolute; top: 4%; right: 4%; font-size: 1.4vw; color: #ff3b3b; animation: blink 1.4s steps(1) infinite; z-index: 2; }
-.cam-anim {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 4%;
-  padding-bottom: 4%;
-  filter: brightness(0.7) contrast(1.15) grayscale(0.3);
+@keyframes scan { to { background-position: 0 220px; } }
+.cam-glitch {
+  position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: repeating-linear-gradient(rgba(255,255,255,0.4) 0 1px, transparent 1px 3px);
+  mix-blend-mode: overlay;
 }
-.cam-anim svg { height: 62%; width: auto; }
-.cam-anim.running svg { height: 46%; filter: blur(2px); transform: skewX(-12deg); }
+.cam-glitch.burst { animation: glitch 0.28s steps(2) 1; }
+@keyframes glitch {
+  0% { opacity: 0.9; transform: translateX(-3%); }
+  50% { opacity: 0.5; transform: translateX(3%); }
+  100% { opacity: 0; }
+}
+.cam-name { position: absolute; top: 4%; left: 4%; font-size: 1.9vw; color: #fff; z-index: 2; text-shadow: 0 0 6px #000; }
+.cam-rec { position: absolute; top: 4%; right: 4%; font-size: 1.3vw; color: #ff3b3b; animation: blink 1.4s steps(1) infinite; z-index: 2; }
+.cam-clock { position: absolute; bottom: 3%; right: 4%; font-size: 1.3vw; color: #cfcfcf; z-index: 2; }
 .cam-disabled {
-  position: absolute;
-  inset: 0;
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: #000;
-  color: #444;
-  font-size: 1.4vw;
-  letter-spacing: 3px;
-  text-align: center;
+  position: absolute; inset: 0; display: none;
+  flex-direction: column; align-items: center; justify-content: center;
+  background: #000; color: #444; font-size: 1.3vw; letter-spacing: 3px; text-align: center;
 }
 .cam-disabled span { font-size: 2vw; color: #666; }
 .cam-disabled.show { display: flex; }
-.cove-stage {
-  position: absolute;
-  left: 50%;
-  bottom: 8%;
-  transform: translateX(-50%);
-  font-size: 1.3vw;
-  color: #ffcf5a;
-  letter-spacing: 2px;
-  text-align: center;
-  z-index: 2;
-  display: none;
-}
-.cove-stage.show { display: block; }
+
 .cam-map {
-  position: absolute;
-  right: 3%;
-  bottom: 3%;
-  width: 34%;
-  height: 42%;
-  background: rgba(10, 10, 10, 0.9);
-  border: 1px solid #555;
-  z-index: 3;
+  position: absolute; right: 3%; bottom: 3%; width: 36%; height: 46%;
+  background:
+    linear-gradient(rgba(30,45,35,0.9), rgba(12,18,14,0.95));
+  border: 1px solid #4a5a4a; z-index: 3;
+  background-image: linear-gradient(rgba(120,160,130,0.06) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(120,160,130,0.06) 1px, transparent 1px);
+  background-size: 8% 12%;
+}
+.map-office {
+  position: absolute; left: 50%; bottom: 3%; transform: translateX(-50%);
+  font-size: 0.85vw; letter-spacing: 2px; color: #8fae95;
+  border: 1px solid #6a8a70; padding: 0.2vw 0.8vw;
 }
 .cam-btn {
-  position: absolute;
-  font-size: 0.9vw;
-  padding: 0.3vw 0.5vw;
-  background: #222;
-  color: #cfcfcf;
-  border: 1px solid #555;
-  cursor: pointer;
-  transform: translate(-50%, -50%);
+  position: absolute; font-size: 0.82vw; padding: 0.25vw 0.5vw;
+  background: #1f291f; color: #bcd; border: 1px solid #5a6a5a; cursor: pointer;
+  transform: translate(-50%, -50%); white-space: nowrap;
 }
-.cam-btn:hover { background: #333; }
-.cam-btn.active { background: #cfcfcf; color: #111; }
-.cam-btn.alert { border-color: #ff3b3b; color: #ff8a8a; }
+.cam-btn:hover { background: #2c382c; }
+.cam-btn.active { background: #cfe0cf; color: #10160f; border-color: #cfe0cf; }
 
 /* ================================================================
-   JUMPSCARE
+   JUMPSCARE (reservado para el elenco futuro)
    ================================================================ */
 #jumpscare {
-  position: absolute;
-  inset: 0;
-  z-index: 2000;
-  background: #000;
-  display: none;
-  align-items: center;
-  justify-content: center;
+  position: absolute; inset: 0; z-index: 2000; background: #000;
+  display: none; align-items: center; justify-content: center;
 }
 #jumpscare.show { display: flex; animation: js-flash 0.09s steps(1) infinite; }
 .js-sprite { width: 90%; height: 92%; display: flex; align-items: center; justify-content: center; }
 .js-sprite svg { height: 100%; width: auto; animation: js-shake 0.05s linear infinite; }
-@keyframes js-flash {
-  0%, 100% { background: #000; }
-  50% { background: #3a0000; }
-}
+@keyframes js-flash { 0%, 100% { background: #000; } 50% { background: #3a0000; } }
 @keyframes js-shake {
   0% { transform: translate(-6px, 4px) scale(1.02); }
-  25% { transform: translate(5px, -5px) scale(1.06); }
-  50% { transform: translate(-4px, 6px) scale(1.01); }
-  75% { transform: translate(6px, 3px) scale(1.05); }
+  50% { transform: translate(5px, -5px) scale(1.06); }
   100% { transform: translate(-5px, -4px) scale(1.03); }
 }
 
 /* ================================================================
-   GAME OVER / 6 A.M.
+   GAME OVER / 6 AM
    ================================================================ */
 #scene-gameover, #scene-6am { background: #000; }
-.gameover, .six-am {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2vw;
+.endcard {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.6vw;
 }
 .go-title { font-size: 5vw; color: #7a1010; letter-spacing: 6px; font-weight: 700; }
 .go-sub { font-size: 1.4vw; color: #7a7a7a; }
-.six-am .am-time { font-size: 6vw; color: #fff; letter-spacing: 6px; }
-.six-am .am-sub { font-size: 1.8vw; color: #b8b8b8; }
-.am-continue {
-  margin-top: 2vw;
-  font-family: inherit;
-  font-size: 1.5vw;
-  color: #d8d8d8;
-  background: #1c1c1c;
-  border: 1px solid #555;
-  padding: 0.7vw 1.8vw;
-  cursor: pointer;
-}
-.am-continue:hover { background: #2c2c2c; color: #fff; }
+.am-time { font-size: 6vw; color: #fff; letter-spacing: 6px; }
+.am-sub { font-size: 1.7vw; color: #b8b8b8; }
+#am-stars { font-size: 2.2vw; }
 
 .anim-svg { display: block; }
+
+/* ================================================================
+   RESPONSIVE (pantallas estrechas)
+   ================================================================ */
+@media (max-aspect-ratio: 1/1) {
+  .menu-title .big { font-size: 12vw; }
+  .menu-item { font-size: 3.4vw; }
+  .btn, .panel-note { font-size: 2.4vw; }
+  .panel-screen h2 { font-size: 5vw; }
+  .custom-list { width: 92%; }
+  .custom-row .cname { font-size: 2.4vw; }
+  .hud-time { font-size: 4.5vw; }
+  .ctrl { font-size: 2vw; }
+  .cam-name { font-size: 3.2vw; }
+}

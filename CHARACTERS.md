@@ -1,72 +1,41 @@
-# Elenco
+# Personajes
 
-Cinco animatrónicos **originales** que cumplen los mismos roles de juego que
-el clásico. Todo está definido en [`js/characters.js`](js/characters.js):
-nombres, colores, rutas, intervalos y niveles de IA. Cambiar cualquier cosa
-ahí no requiere tocar el motor.
+El elenco anterior se ha retirado. **El diseño definitivo del elenco está
+pendiente** y se anunciará más adelante.
 
-| Personaje | Especie | Rol clásico | Puerta | Ruido |
-|-----------|---------|-------------|--------|-------|
-| **Bruno** | Oso | El presentador | Este (der.) | Risa grave al moverse |
-| **Vega**  | Conejo | El de la izquierda | Oeste (izq.) | Ninguno |
-| **Pola**  | Gallina | La de la derecha | Este (der.) | Cacharros en Cocina |
-| **Rufo**  | Zorro | El pirata que corre | Oeste (izq.) | Golpe fuerte al atacar |
-| **Áureo** | Oso dorado | La alucinación oculta | — | Zumbido agudo |
+## Personaje reservado
 
-## Sistema de IA (fiel al original)
+| Personaje | Especie | Estado |
+|-----------|---------|--------|
+| **Dogo**  | Perro   | Pendiente — sin comportamiento todavía |
 
-Cada animatrónico tiene un **nivel 0–20**. Cada X segundos "tira un d20"; si
-el resultado es ≤ su nivel, **avanza**. Nivel 0 = nunca se mueve.
+`Dogo` es un marcador de posición. Aparece en la ficha de **Elenco** y como
+único deslizador de la **Noche Personalizada**, pero **no se mueve durante la
+noche**. Su arte definitivo y su lógica llegarán en una actualización
+posterior, con su propia carpeta de recursos.
 
-Intervalos de movimiento: Bruno 3,02 s · Vega 4,97 s · Pola 4,98 s · Rufo 5,01 s.
+## Cómo se añadirá un personaje
 
-### Niveles por noche
+Todo está preparado para reconectar personajes sin tocar el orquestador:
 
-| Noche | Bruno | Vega | Pola | Rufo |
-|------:|:-----:|:----:|:----:|:----:|
-| 1 | 0 | 2 | 1 | 1 |
-| 2 | 0 | 4 | 3 | 3 |
-| 3 | 1 | 6 | 5 | 5 |
-| 4 | 2 | 9 | 8 | 8 |
-| 5 | 3 | 12 | 11 | 12 |
-| 6 | 4 | 16 | 16 | 16 |
-| 7 | \*personalizada\* | | | |
+1. **`js/characters.js`**
+   - `implemented: true` en su entrada de `ANIMATRONICS`.
+   - `moveInterval`, `start`, `path` / fases, `door`.
+   - Niveles por noche en `NIGHT_AI` (escala 0&ndash;20).
+   - Añadirlo a `ROSTER` (activo en la noche) y, si procede, a `CUSTOM_ROSTER`.
+   - Un sprite SVG en `SPRITES` para su `species`.
+2. **`js/ai.js`**
+   - Su comportamiento en `behave()` (o una función propia).
+   - Exponerlo en `presenceInCam` / `atDoor` / `inOffice` para el render.
+3. **`js/game.js`** no necesita cambios: ya dibuja lo que el motor
+   reporte y dispara el jumpscare cuando el motor llama a `hooks.jumpscare`.
 
-A las **4 a.m.** (noche ≥ 3) todos suben +1. Bruno suma +2 extra si la
-energía baja de 30 %.
+## Sistema de IA previsto
 
-## Comportamientos propios
-
-**Bruno** — no se activa hasta que Vega y Pola han dejado el escenario al
-menos una vez. Se **congela** mientras lo miras en su cámara. Va por el lado
-este; si llega al Pasillo Este (esq.) con la puerta derecha cerrada,
-retrocede. Si entra en la oficina, te mata al bajar el monitor. En un
-**apagón** aparece en la puerta izquierda con la cara iluminada y una
-melodía; tras un tiempo aleatorio, ataca (a menos que lleguen las 6 a.m.).
-
-**Vega y Pola** — recorren salas hacia su puerta (con ramas para que no sea
-lineal). En la esquina de tu puerta: si la cierras, se van; si la dejas
-abierta y subes el monitor, se cuelan y te matan cuando lo bajes. Cerrar la
-puerta con ellos ya dentro los expulsa.
-
-**Rufo** — no cambia de sala: progresa por 4 fases en La Cala (cortina
-cerrada → asomando → fuera → corriendo). Mirarlo por la cámara 1C lo frena y
-puede hacerle retroceder. Si dejas las cámaras bajadas más de 6 s, avanza al
-doble. Al llegar a la fase 4 esprinta por el pasillo oeste: si la puerta
-izquierda está cerrada gastas energía (1 % + 5 % por cada golpe anterior) y
-se reinicia; si está abierta, es instantáneo.
-
-**Áureo** — evento raro desde la noche 2. Un póster de la oficina cambia a su
-cara; si no subes el monitor, aparece desplomado en el suelo. Subir el
-monitor lo disuelve. Si te quedas mirándolo, te mata.
-
-## Contadores rápidos
-
-- **Vega / Pola:** luz de puerta con frecuencia; si ves la cara, cierra.
-- **Bruno:** vigílalo por cámara; energía siempre por encima de 30.
-- **Rufo:** un vistazo a 1C cada poco; no abuses de tener las cámaras bajadas.
-- **Áureo:** monitor arriba en cuanto veas el póster raro.
+Cada animatrónico tendrá un nivel **0&ndash;20**. Cada `moveInterval` ms se
+tira un d20; si el resultado es ≤ su nivel, avanza. Nivel 0 = nunca se mueve.
+A las **4 a.m.** (noche ≥ 3) todos suben +1.
 
 ---
 
-Elenco y arte originales. No afiliado con Scott Cawthon / Scott Games.
+Personajes y arte originales. No afiliado con Scott Cawthon / Scott Games.

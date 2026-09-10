@@ -1,6 +1,9 @@
 /* ================================================================
    Five Nights at Freddy's - clon
-   Orquestador: escenas + bucle de noche + integración con la IA.
+   Orquestador: escenas + bucle de noche + oficina + cámaras.
+
+   El elenco está desactivado (ver js/characters.js / js/ai.js), así que
+   la única forma de perder ahora mismo es quedarse sin energía.
    ================================================================ */
 (function () {
   "use strict";
@@ -27,6 +30,9 @@
       scenes[k].classList.toggle("active", k === name);
     });
   }
+  var $ = function (id) {
+    return document.getElementById(id);
+  };
 
   /* ---------------------------------------------------------------
      Progreso persistente
@@ -40,17 +46,39 @@
       localStorage.setItem("fnaf.maxNight", String(Math.min(Math.max(v, 1), 7)));
     } catch (e) {}
   }
+  function starsEarned() {
+    return Math.min(getMaxNight() - 1, 6);
+  }
+
+  /* ---------------------------------------------------------------
+     Sonido on/off
+     --------------------------------------------------------------- */
+  var soundOn = localStorage.getItem("fnaf.sound") !== "off";
+  function applySound() {
+    Sound.setEnabled(soundOn);
+    var t = $("sound-toggle");
+    t.classList.toggle("off", !soundOn);
+    t.innerHTML = soundOn ? "&#128266;" : "&#128263;";
+  }
+  $("sound-toggle").addEventListener("click", function () {
+    soundOn = !soundOn;
+    try {
+      localStorage.setItem("fnaf.sound", soundOn ? "on" : "off");
+    } catch (e) {}
+    if (soundOn) Sound.resume();
+    applySound();
+  });
 
   /* ---------------------------------------------------------------
      Estado
      --------------------------------------------------------------- */
-  var HOUR_MS = 45000; // ~4,5 min por noche
-  var DRAIN_PER_BAR = 0.09; // % por segundo y "barra" de consumo
+  var HOUR_MS = 45000;
+  var DRAIN_PER_BAR = 0.09;
 
   var state = {
     night: 1,
     custom: false,
-    customLevels: { bruno: 10, vega: 10, pola: 10, rufo: 10 },
+    customLevels: {},
     hour: 0,
     hourAcc: 0,
     power: 100,
@@ -62,14 +90,17 @@
     currentCam: "1A",
     running: false,
   };
+  C.CUSTOM_ROSTER.forEach(function (id) {
+    var a = C.ANIMATRONICS[id];
+    state.customLevels[id] = a && typeof a.customDefault === "number" ? a.customDefault : 0;
+  });
 
   var ai = null;
   var lastTs = 0;
-  var camDownSince = 0; // performance.now() cuando se bajó el monitor
-  var golden = null; // { timer }
+  var camDownSince = 0;
 
   /* ---------------------------------------------------------------
-     HOOKS para el motor de IA
+     Hooks del motor de IA
      --------------------------------------------------------------- */
   var hooks = {
     cameraUp: function () {
@@ -94,18 +125,12 @@
       state.power = Math.max(0, state.power - pct);
       updateHud();
     },
+    onBlackoutOver: function () {
+      gameOver("Se acabó la energía.");
+    },
     jumpscare: function (id) {
-      triggerJumpscare(id);
-    },
-    onMove: function (id) {
-      if (id === "bruno") Sound.laugh();
-      else Sound.step();
-    },
-    onFoxyRun: function () {
-      Sound.foxyRun();
-    },
-    onFoxyBlocked: function () {
-      Sound.foxyBang();
+      // reservado para cuando vuelva el elenco
+      gameOver("Te atrapó " + (C.ANIMATRONICS[id] ? C.ANIMATRONICS[id].name : "algo") + ".", id);
     },
   };
 
@@ -115,22 +140,25 @@
   var menuItems = [].slice.call(document.querySelectorAll("#menu-list .menu-item"));
   var menuIndex = 0;
 
+  function itemByAction(a) {
+    return menuItems.filter(function (e) {
+      return e.dataset.action === a;
+    })[0];
+  }
   function refreshMenu() {
     var max = getMaxNight();
-    setItemEnabled("continue", max > 1);
-    setItemEnabled("night6", max >= 6);
-    setItemEnabled("custom", max >= 7);
-    // primer elemento habilitado seleccionado
+    itemByAction("continue").disabled = max <= 1;
+    itemByAction("night6").disabled = max < 6;
     if (menuItems[menuIndex].disabled) menuIndex = 0;
     menuItems.forEach(function (el, i) {
       el.classList.toggle("selected", i === menuIndex);
     });
+    renderStars($("menu-stars"), starsEarned());
   }
-  function setItemEnabled(action, on) {
-    var el = menuItems.filter(function (e) {
-      return e.dataset.action === action;
-    })[0];
-    if (el) el.disabled = !on;
+  function renderStars(el, n) {
+    var s = "";
+    for (var i = 0; i < 6; i++) s += i < n ? "★" : '<span class="dim">☆</span>';
+    el.innerHTML = s;
   }
   function moveMenu(dir) {
     var n = menuItems.length;
@@ -174,7 +202,7 @@
      ELENCO
      --------------------------------------------------------------- */
   function openRoster() {
-    var grid = document.getElementById("roster-grid");
+    var grid = $("roster-grid");
     if (!grid.childNodes.length) {
       Object.keys(C.ANIMATRONICS).forEach(function (id) {
         var a = C.ANIMATRONICS[id];
@@ -185,69 +213,68 @@
           C.spriteFor(id, "normal") +
           "</div>" +
           '<div class="info">' +
-          "<h3>" +
-          a.name +
-          "</h3>" +
-          '<div class="role">' +
-          a.role +
-          "</div>" +
-          "<p>" +
-          a.bio +
-          "</p>" +
-          '<p class="counter">' +
-          a.counter +
-          "</p>" +
+          "<h3>" + a.name + "</h3>" +
+          '<div class="role">' + a.role + "</div>" +
+          "<p>" + a.bio + "</p>" +
+          '<span class="badge">' +
+          (a.implemented === false ? "PENDIENTE" : "ACTIVO") +
+          "</span>" +
           "</div>";
         grid.appendChild(card);
       });
     }
     showScene("roster");
   }
-  document.getElementById("btn-roster-back").addEventListener("click", function () {
+  $("btn-roster-back").addEventListener("click", function () {
     showScene("menu");
     refreshMenu();
   });
 
   /* ---------------------------------------------------------------
-     NOCHE PERSONALIZADA
+     NOCHE PERSONALIZADA  (interfaz completa, inicio deshabilitado)
      --------------------------------------------------------------- */
-  function openCustom() {
-    var box = document.getElementById("custom-sliders");
-    if (!box.childNodes.length) {
-      C.ROSTER.forEach(function (id) {
-        var a = C.ANIMATRONICS[id];
-        var row = document.createElement("div");
-        row.className = "custom-row";
-        row.innerHTML =
-          '<span class="cname">' +
-          a.name +
-          "</span>" +
-          '<input type="range" min="0" max="20" value="' +
-          state.customLevels[id] +
-          '" data-id="' +
-          id +
-          '">' +
-          '<span class="cval">' +
-          state.customLevels[id] +
-          "</span>";
-        var input = row.querySelector("input");
-        input.addEventListener("input", function () {
-          state.customLevels[id] = parseInt(input.value, 10);
-          row.querySelector(".cval").textContent = input.value;
-        });
-        box.appendChild(row);
+  function buildCustom() {
+    var list = $("custom-list");
+    list.innerHTML = "";
+    C.CUSTOM_ROSTER.forEach(function (id) {
+      var a = C.ANIMATRONICS[id];
+      var row = document.createElement("div");
+      row.className = "custom-row";
+      row.innerHTML =
+        '<span class="cface">' + C.spriteFor(id, "normal") + "</span>" +
+        '<span class="cname">' + a.name + "</span>" +
+        '<input type="range" min="0" max="20" value="' +
+        state.customLevels[id] + '" data-id="' + id + '">' +
+        '<span class="cval">' + state.customLevels[id] + "</span>";
+      var input = row.querySelector("input");
+      input.addEventListener("input", function () {
+        state.customLevels[id] = parseInt(input.value, 10) || 0;
+        row.querySelector(".cval").textContent = input.value;
       });
-    }
+      list.appendChild(row);
+    });
+  }
+  function openCustom() {
+    buildCustom();
     showScene("custom");
   }
-  document.getElementById("btn-custom-back").addEventListener("click", function () {
+  [].forEach.call(document.querySelectorAll("#custom-presets .chip"), function (chip) {
+    chip.addEventListener("click", function () {
+      var v = parseInt(chip.dataset.preset, 10) || 0;
+      C.CUSTOM_ROSTER.forEach(function (id) {
+        state.customLevels[id] = v;
+      });
+      buildCustom();
+    });
+  });
+  $("btn-custom-back").addEventListener("click", function () {
     showScene("menu");
     refreshMenu();
   });
-  document.getElementById("btn-custom-start").addEventListener("click", function () {
-    Sound.resume();
-    state.custom = true;
-    startNight(7);
+  // El botón "Empezar" está deshabilitado a propósito: la noche
+  // personalizada todavía no se puede iniciar.
+  $("btn-custom-start").addEventListener("click", function () {
+    /* pendiente */
   });
 
   /* ---------------------------------------------------------------
@@ -260,8 +287,13 @@
   }
   function enterNightIntro() {
     showScene("nightintro");
-    document.getElementById("night-label").textContent =
-      state.custom ? "Noche 7" : "Noche " + state.night;
+    $("night-label").textContent = "Noche " + state.night;
+    $("night-clock").textContent = "12:00 AM";
+    // reinicia la animación
+    var el = document.querySelector(".night-intro");
+    el.style.animation = "none";
+    void el.offsetWidth;
+    el.style.animation = "";
     setTimeout(function () {
       startNight(state.night);
     }, 3000);
@@ -272,7 +304,7 @@
 
   function startNight(night) {
     state.night = night;
-    state.custom = night >= 7;
+    state.custom = false;
     state.hour = 0;
     state.hourAcc = 0;
     state.power = 100;
@@ -281,23 +313,20 @@
     state.camOpen = false;
     state.currentCam = "1A";
     state.running = true;
-    golden = null;
     camDownSince = performance.now();
 
     ai = FNAF.AI.create(hooks);
     ai.setNight(night);
-    ai.reset({
-      levels: C.aiForNight(night, state.custom ? state.customLevels : null),
-    });
+    ai.reset({ levels: C.aiForNight(night, null) });
 
-    document.getElementById("hud-night").textContent =
-      state.custom ? "Noche 7" : "Noche " + night;
+    $("hud-night").textContent = "Noche " + night;
     buildCamMap();
     syncDoors();
     updateHud();
-    setCamOpen(false, true);
-    hideJumpscare();
+    $("cam-panel").classList.remove("open");
+    $("jumpscare").classList.remove("show");
     scenes.office.classList.remove("blackout");
+    selectCam("1A");
     showScene("office");
 
     Sound.startAmbience();
@@ -306,7 +335,7 @@
   }
 
   /* ---------------------------------------------------------------
-     BUCLE PRINCIPAL
+     BUCLE
      --------------------------------------------------------------- */
   function loop(ts) {
     if (!state.running) return;
@@ -319,7 +348,7 @@
     if (state.hourAcc >= HOUR_MS) {
       state.hourAcc -= HOUR_MS;
       state.hour++;
-      updateHud();
+      updateHud(true);
       if (state.hour >= 6) {
         winNight();
         return;
@@ -333,15 +362,10 @@
       if (state.power === 0) enterBlackout();
     }
 
-    // IA
     ai.update(dt);
     if (ai.isOver()) return;
 
-    // alucinación de Áureo
-    updateGolden(dt);
-
     updateHud();
-    render();
     requestAnimationFrame(loop);
   }
 
@@ -358,12 +382,21 @@
   /* ---------------------------------------------------------------
      HUD
      --------------------------------------------------------------- */
-  function updateHud() {
-    var label = state.hour === 0 ? "12" : String(state.hour);
-    document.getElementById("hud-time").innerHTML = label + "&nbsp;a.m.";
-    document.getElementById("power-value").textContent = Math.ceil(state.power);
+  function fmtHour() {
+    return (state.hour === 0 ? 12 : state.hour) + " AM";
+  }
+  function updateHud(tick) {
+    var t = $("hud-time");
+    t.textContent = fmtHour();
+    if (tick) {
+      t.classList.remove("tick");
+      void t.offsetWidth;
+      t.classList.add("tick");
+    }
+    $("cam-clock").textContent = fmtHour();
+    $("power-value").textContent = Math.ceil(state.power);
     var bars = usageBars();
-    var u = document.getElementById("power-usage");
+    var u = $("power-usage");
     u.textContent = new Array(bars + 1).join("■");
     u.style.color = bars <= 2 ? "#35d635" : bars <= 4 ? "#e8e800" : "#ff4040";
   }
@@ -372,52 +405,47 @@
      PUERTAS Y LUCES
      --------------------------------------------------------------- */
   function syncDoors() {
-    var dl = document.getElementById("door-left");
-    var dr = document.getElementById("door-right");
+    var dl = $("door-left"), dr = $("door-right");
     dl.classList.toggle("closed", state.doorLeft);
     dr.classList.toggle("closed", state.doorRight);
     dl.classList.toggle("lit", state.lightLeft && !state.doorLeft);
     dr.classList.toggle("lit", state.lightRight && !state.doorRight);
-    document.getElementById("btn-left-door").classList.toggle("active", state.doorLeft);
-    document.getElementById("btn-right-door").classList.toggle("active", state.doorRight);
-    document.getElementById("btn-left-light").classList.toggle("active", state.lightLeft);
-    document.getElementById("btn-right-light").classList.toggle("active", state.lightRight);
+    $("hall-left").classList.toggle("on", state.lightLeft && !state.doorLeft);
+    $("hall-right").classList.toggle("on", state.lightRight && !state.doorRight);
+    $("btn-left-door").classList.toggle("active", state.doorLeft);
+    $("btn-right-door").classList.toggle("active", state.doorRight);
+    $("btn-left-light").classList.toggle("active", state.lightLeft);
+    $("btn-right-light").classList.toggle("active", state.lightRight);
   }
-
   function canAct() {
     return state.running && state.power > 0 && !ai.isBlackout();
   }
 
-  document.getElementById("btn-left-door").addEventListener("click", function () {
+  $("btn-left-door").addEventListener("click", function () {
     if (!canAct()) return;
     state.doorLeft = !state.doorLeft;
     Sound.doorSlam();
     syncDoors();
-    render();
   });
-  document.getElementById("btn-right-door").addEventListener("click", function () {
+  $("btn-right-door").addEventListener("click", function () {
     if (!canAct()) return;
     state.doorRight = !state.doorRight;
     Sound.doorSlam();
     syncDoors();
-    render();
   });
   bindHold("btn-left-light", "lightLeft");
   bindHold("btn-right-light", "lightRight");
-
   function bindHold(btnId, prop) {
-    var btn = document.getElementById(btnId);
+    var btn = $(btnId);
     var on = function (e) {
       if (e) e.preventDefault();
       if (!canAct()) return;
       state[prop] = true;
       syncDoors();
-      render();
     };
     var off = function () {
       state[prop] = false;
       syncDoors();
-      render();
     };
     btn.addEventListener("mousedown", on);
     btn.addEventListener("mouseup", off);
@@ -430,49 +458,56 @@
      CÁMARAS
      --------------------------------------------------------------- */
   function buildCamMap() {
-    var map = document.getElementById("cam-map");
-    map.innerHTML = "";
+    var map = $("cam-map");
+    [].forEach.call(map.querySelectorAll(".cam-btn"), function (b) {
+      b.remove();
+    });
     C.CAMS.forEach(function (cam) {
       var b = document.createElement("button");
       b.className = "cam-btn";
       b.dataset.id = cam.id;
-      b.textContent = "CÁM " + cam.id;
+      b.textContent = cam.id;
+      b.title = cam.name;
       b.style.left = cam.x + "%";
       b.style.top = cam.y + "%";
       b.addEventListener("click", function () {
+        if (cam.id !== state.currentCam) glitchBurst();
         selectCam(cam.id);
       });
       map.appendChild(b);
     });
   }
-
+  function glitchBurst() {
+    var g = $("cam-glitch");
+    g.classList.remove("burst");
+    void g.offsetWidth;
+    g.classList.add("burst");
+    Sound.camStatic();
+  }
   function selectCam(id) {
     state.currentCam = id;
     var cam = C.CAMS.filter(function (c) {
       return c.id === id;
     })[0];
-    document.getElementById("cam-name").textContent =
-      "CÁM " + id + " — " + (cam ? cam.name : "");
+    $("cam-name").textContent = "CÁM " + id + " — " + (cam ? cam.name : "");
+    $("cam-disabled").classList.toggle("show", !!(cam && cam.audioOnly));
     [].forEach.call(document.querySelectorAll("#cam-map .cam-btn"), function (b) {
       b.classList.toggle("active", b.dataset.id === id);
     });
-    render();
   }
-
-  function setCamOpen(open, silent) {
+  function setCamOpen(open) {
     if (!state.running || state.power <= 0 || ai.isBlackout()) open = false;
     var was = state.camOpen;
     state.camOpen = open;
-    document.getElementById("cam-panel").classList.toggle("open", open);
+    $("cam-panel").classList.toggle("open", open);
     if (!open) camDownSince = performance.now();
-    if (open && !was) selectCam(state.currentCam);
-    if (!silent && was !== open) Sound.camToggle(open);
-    // bajar el monitor disuelve a Áureo
-    if (open && golden) clearGolden();
+    if (was !== open) {
+      Sound.camToggle(open);
+      if (open) glitchBurst();
+    }
     updateHud();
-    render();
   }
-  document.getElementById("cam-tab").addEventListener("click", function () {
+  $("cam-tab").addEventListener("click", function () {
     setCamOpen(!state.camOpen);
   });
   document.addEventListener("keydown", function (e) {
@@ -484,166 +519,6 @@
   });
 
   /* ---------------------------------------------------------------
-     RENDER (cada frame y en cada acción)
-     --------------------------------------------------------------- */
-  function render() {
-    if (!ai) return;
-    var blackout = ai.isBlackout();
-
-    // --- puerta izquierda / derecha: animatrónico visible con la luz ---
-    var left = document.getElementById("anim-left");
-    var right = document.getElementById("anim-right");
-    var atL = ai.atDoor("left");
-    var atR = ai.atDoor("right");
-    paintDoorway(left, state.lightLeft && !state.doorLeft && atL.length ? atL[0] : null);
-    paintDoorway(right, state.lightRight && !state.doorRight && atR.length ? atR[0] : null);
-
-    // --- alguien dentro de la oficina ---
-    var inOff = ai.inOffice();
-    var oa = document.getElementById("office-anim");
-    if (inOff.length && !blackout) {
-      var who = inOff.indexOf("bruno") >= 0 ? "bruno" : inOff[0];
-      if (oa.dataset.who !== who) oa.innerHTML = C.spriteFor(who, "normal");
-      oa.dataset.who = who;
-      oa.classList.add("show");
-    } else {
-      oa.classList.remove("show");
-      oa.dataset.who = "";
-    }
-
-    // --- cara de Bruno en el apagón ---
-    var bf = document.getElementById("blackout-face");
-    if (blackout) {
-      if (bf.dataset.on !== "1") bf.innerHTML = C.spriteFor("bruno", "normal");
-      bf.dataset.on = "1";
-      bf.classList.add("show");
-      scenes.office.classList.add("blackout");
-    } else {
-      bf.classList.remove("show");
-      bf.dataset.on = "";
-    }
-
-    // --- póster / Áureo ---
-    var poster = document.getElementById("office-poster");
-    if (golden && golden.phase === "poster") {
-      if (!poster.classList.contains("golden")) {
-        poster.classList.add("golden");
-        poster.innerHTML = C.spriteFor("aureo", "normal");
-      }
-    } else if (!golden && poster.classList.contains("golden")) {
-      poster.classList.remove("golden");
-      poster.textContent = "¡Celebra!";
-    }
-    if (golden && golden.phase === "office") {
-      if (oa.dataset.who !== "aureo") oa.innerHTML = C.spriteFor("aureo", "normal");
-      oa.dataset.who = "aureo";
-      oa.classList.add("show");
-    }
-
-    // --- panel de cámaras ---
-    if (state.camOpen) renderCamPanel();
-
-    // --- alertas en el mapa ---
-    [].forEach.call(document.querySelectorAll("#cam-map .cam-btn"), function (b) {
-      var p = ai.presenceInCam(b.dataset.id);
-      var hot = p.some(function (e) {
-        return e.running || e.id !== "rufo" || e.stage >= 2;
-      });
-      b.classList.toggle("alert", p.length > 0 && hot);
-    });
-  }
-
-  function paintDoorway(el, id) {
-    if (!id) {
-      el.classList.remove("show");
-      el.dataset.who = "";
-      return;
-    }
-    if (el.dataset.who !== id) el.innerHTML = C.spriteFor(id, "normal");
-    el.dataset.who = id;
-    el.classList.add("show");
-  }
-
-  function renderCamPanel() {
-    var cam = C.CAMS.filter(function (c) {
-      return c.id === state.currentCam;
-    })[0];
-    var disabled = document.getElementById("cam-disabled");
-    var cove = document.getElementById("cove-stage");
-    var feed = document.getElementById("cam-anim");
-
-    disabled.classList.toggle("show", !!(cam && cam.audioOnly));
-
-    var pres = ai.presenceInCam(state.currentCam);
-
-    // La Cala: mostrar la fase de Rufo
-    if (state.currentCam === "1C") {
-      var rufo = ai.actors().rufo;
-      cove.classList.add("show");
-      cove.textContent =
-        C.ANIMATRONICS.rufo.stages[Math.min(rufo.stage, 3)];
-    } else {
-      cove.classList.remove("show");
-    }
-
-    if (cam && cam.audioOnly) {
-      feed.innerHTML = "";
-      return;
-    }
-
-    var html = "";
-    var running = false;
-    pres.forEach(function (e) {
-      if (e.id === "rufo" && e.running) running = true;
-      if (e.id === "rufo" && !e.running && state.currentCam === "1C" && e.stage === 0) {
-        return; // cortina cerrada: no se ve
-      }
-      html += C.spriteFor(e.id, "normal");
-    });
-    feed.classList.toggle("running", running);
-    if (feed.dataset.sig !== state.currentCam + "|" + html.length + "|" + running) {
-      feed.innerHTML = html;
-      feed.dataset.sig = state.currentCam + "|" + html.length + "|" + running;
-    }
-  }
-
-  /* ---------------------------------------------------------------
-     ÁUREO (alucinación rara)
-     --------------------------------------------------------------- */
-  function updateGolden(dt) {
-    if (golden) {
-      golden.timer -= dt;
-      if (golden.phase === "poster" && golden.timer <= 0) {
-        // si no subiste el monitor, se materializa
-        golden.phase = "office";
-        golden.timer = 1800;
-        Sound.goldenHum();
-      } else if (golden.phase === "office" && golden.timer <= 0) {
-        triggerJumpscare("aureo");
-      }
-      return;
-    }
-    if (state.night < 2 || state.camOpen || ai.isBlackout()) return;
-    if (ai.inOffice().length) return;
-    if (Math.random() < 0.0016) {
-      golden = { phase: "poster", timer: 1400 };
-      Sound.goldenHum();
-      render();
-    }
-  }
-  function clearGolden() {
-    golden = null;
-    var poster = document.getElementById("office-poster");
-    poster.classList.remove("golden");
-    poster.textContent = "¡Celebra!";
-    var oa = document.getElementById("office-anim");
-    if (oa.dataset.who === "aureo") {
-      oa.classList.remove("show");
-      oa.dataset.who = "";
-    }
-  }
-
-  /* ---------------------------------------------------------------
      APAGÓN
      --------------------------------------------------------------- */
   function enterBlackout() {
@@ -651,7 +526,7 @@
     state.doorLeft = state.doorRight = false;
     state.lightLeft = state.lightRight = false;
     state.camOpen = false;
-    document.getElementById("cam-panel").classList.remove("open");
+    $("cam-panel").classList.remove("open");
     syncDoors();
     updateHud();
     scenes.office.classList.add("blackout");
@@ -661,32 +536,32 @@
     setTimeout(function () {
       if (state.running && ai.isBlackout()) Sound.startJingle();
     }, 1600);
-    render();
   }
 
   /* ---------------------------------------------------------------
-     JUMPSCARE / FIN
+     FIN
      --------------------------------------------------------------- */
-  function triggerJumpscare(id) {
+  function gameOver(reason, charId) {
     if (!state.running) return;
     state.running = false;
     Sound.stopJingle();
     Sound.stopAmbience();
-    Sound.jumpscare();
 
-    var js = document.getElementById("jumpscare");
-    document.getElementById("js-sprite").innerHTML = C.spriteFor(id, "jumpscare");
-    js.classList.add("show");
-
-    setTimeout(function () {
-      js.classList.remove("show");
-      document.getElementById("go-sub").textContent =
-        "Te atrapó " + C.ANIMATRONICS[id].name + ".";
-      showScene("gameover");
-    }, 1100);
+    if (charId) {
+      Sound.jumpscare();
+      $("js-sprite").innerHTML = C.spriteFor(charId, "jumpscare");
+      $("jumpscare").classList.add("show");
+      setTimeout(function () {
+        $("jumpscare").classList.remove("show");
+        showGameOver(reason);
+      }, 1100);
+    } else {
+      showGameOver(reason);
+    }
   }
-  function hideJumpscare() {
-    document.getElementById("jumpscare").classList.remove("show");
+  function showGameOver(reason) {
+    $("go-sub").textContent = reason || "";
+    showScene("gameover");
   }
 
   function winNight() {
@@ -695,23 +570,17 @@
     Sound.stopAmbience();
     Sound.chime6am();
     scenes.office.classList.remove("blackout");
-    document.getElementById("cam-panel").classList.remove("open");
+    $("cam-panel").classList.remove("open");
 
-    if (!state.custom) {
-      setMaxNight(Math.max(getMaxNight(), Math.min(state.night + 1, 7)));
-    }
-    document.getElementById("am-sub").textContent = state.custom
-      ? "Has superado la noche personalizada"
-      : "Has sobrevivido la Noche " + state.night;
+    setMaxNight(Math.max(getMaxNight(), Math.min(state.night + 1, 7)));
+    $("am-sub").textContent = "Has sobrevivido la Noche " + state.night;
+    renderStars($("am-stars"), starsEarned());
     showScene("sixam");
   }
 
-  document
-    .getElementById("btn-gameover-continue")
-    .addEventListener("click", backToMenu);
-  document.getElementById("btn-6am-continue").addEventListener("click", function () {
-    if (!state.custom && state.night < 6) {
-      // encadena directamente a la siguiente noche
+  $("btn-gameover-continue").addEventListener("click", backToMenu);
+  $("btn-6am-continue").addEventListener("click", function () {
+    if (state.night < 6) {
       state.night += 1;
       enterNightIntro();
     } else {
@@ -726,10 +595,14 @@
   /* ---------------------------------------------------------------
      Arranque
      --------------------------------------------------------------- */
-  document.addEventListener("click", function once() {
-    Sound.resume();
-    document.removeEventListener("click", once);
-  });
+  document.addEventListener(
+    "click",
+    function once() {
+      if (soundOn) Sound.resume();
+      document.removeEventListener("click", once);
+    }
+  );
+  applySound();
   refreshMenu();
   showScene("menu");
 })();
