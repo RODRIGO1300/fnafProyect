@@ -190,6 +190,14 @@ html, body {
   justify-content: center;
 }
 .roster-card .art svg { width: 100%; height: auto; opacity: 0.9; }
+.roster-card .art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: 250px;
+  object-fit: contain;
+  object-position: center bottom;
+}
 .roster-card .info h3 { font-size: 1.5vw; color: #fff; }
 .roster-card .info .role { font-size: 1vw; color: #b6b6b6; margin-bottom: 0.5vw; letter-spacing: 1px; }
 .roster-card .info p { font-size: 0.95vw; line-height: 1.45; color: #9c9c9c; margin-bottom: 0.5vw; }
@@ -239,14 +247,16 @@ html, body {
 /* ================================================================
    PERIODICO
    ================================================================ */
-#scene-news { background: #111; }
+#scene-news {
+  background: #111 url("../assets/escenarios/periodico-inicio.png") center / cover no-repeat;
+}
 .newspaper {
   position: absolute;
   inset: 0;
   margin: auto;
   width: 62%;
   height: 82%;
-  background: #cfc7b3;
+  background: rgba(207, 199, 179, 0.2);
   color: #17140f;
   padding: 3.5%;
   font-family: "Times New Roman", Georgia, serif;
@@ -381,7 +391,7 @@ html, body {
 .ctrl-right-door { right: 15%; bottom: 32%; }
 .ctrl-right-light { right: 15%; bottom: 25%; }
 
-/* pestaña de cámaras */
+/* pestaña de cámaras (abrir) */
 .cam-tab {
   position: absolute; z-index: 500; bottom: 0; left: 50%; transform: translateX(-50%);
   width: 32%; text-align: center; padding: 0.4vw 0; cursor: pointer;
@@ -393,6 +403,18 @@ html, body {
   content: ""; position: absolute; left: 50%; top: -6px; transform: translateX(-50%);
   border: 6px solid transparent; border-bottom-color: #777;
 }
+#scene-office.cams-open .cam-tab { display: none; }
+
+/* barra para cerrar las cámaras (dentro del panel) */
+.cam-close {
+  position: absolute; z-index: 5; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 46%; padding: 0.55vw 0; cursor: pointer;
+  font-family: inherit; color: #cdd6cd;
+  background: linear-gradient(rgba(20, 26, 20, 0.4), rgba(12, 16, 12, 0.92));
+  border: 1px solid #5a6a5a; border-bottom: none;
+}
+.cam-close span { font-size: 1.05vw; letter-spacing: 3px; }
+.cam-close:hover { background: linear-gradient(rgba(40, 50, 40, 0.5), rgba(20, 26, 20, 0.96)); color: #fff; }
 
 /* panel de cámaras */
 .cam-panel { position: absolute; inset: 0; z-index: 600; background: #000; display: none; }
@@ -402,6 +424,9 @@ html, body {
   background:
     repeating-linear-gradient(115deg, rgba(255,255,255,0.02) 0 3px, transparent 3px 7px),
     linear-gradient(#1a1712, #050403);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 .cam-feed::after {
   content: ""; position: absolute; inset: 0; pointer-events: none;
@@ -432,7 +457,7 @@ html, body {
 .cam-disabled.show { display: flex; }
 
 .cam-map {
-  position: absolute; right: 3%; bottom: 3%; width: 36%; height: 46%;
+  position: absolute; right: 3%; bottom: 9%; width: 36%; height: 44%;
   background:
     linear-gradient(rgba(30,45,35,0.9), rgba(12,18,14,0.95));
   border: 1px solid #4a5a4a; z-index: 3;

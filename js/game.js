@@ -99,6 +99,15 @@
   var lastTs = 0;
   var camDownSince = 0;
 
+  // Precarga de los fondos de cámara para que el cambio no parpadee.
+  (function preloadCams() {
+    C.CAMS.forEach(function (cam) {
+      if (!cam.background) return;
+      var img = new Image();
+      img.src = cam.background;
+    });
+  })();
+
   /* ---------------------------------------------------------------
      Hooks del motor de IA
      --------------------------------------------------------------- */
@@ -208,9 +217,12 @@
         var a = C.ANIMATRONICS[id];
         var card = document.createElement("div");
         card.className = "roster-card";
+        var rosterArt = a.rosterImage
+          ? '<img src="' + a.rosterImage + '" alt="Retrato de ' + a.name + '">'
+          : C.spriteFor(id, "normal");
         card.innerHTML =
           '<div class="art">' +
-          C.spriteFor(id, "normal") +
+          rosterArt +
           "</div>" +
           '<div class="info">' +
           "<h3>" + a.name + "</h3>" +
@@ -236,6 +248,11 @@
   function buildCustom() {
     var list = $("custom-list");
     list.innerHTML = "";
+    if (!C.CUSTOM_ROSTER.length) {
+      list.innerHTML =
+        '<p class="panel-note">Todavía no hay animatrónicos disponibles.</p>';
+      return;
+    }
     C.CUSTOM_ROSTER.forEach(function (id) {
       var a = C.ANIMATRONICS[id];
       var row = document.createElement("div");
@@ -491,6 +508,9 @@
     })[0];
     $("cam-name").textContent = "CÁM " + id + " — " + (cam ? cam.name : "");
     $("cam-disabled").classList.toggle("show", !!(cam && cam.audioOnly));
+    $("cam-feed").style.backgroundImage = cam && cam.background
+      ? 'linear-gradient(rgba(0, 8, 4, 0.16), rgba(0, 0, 0, 0.34)), url("' + cam.background + '")'
+      : "linear-gradient(#15130f, #000)";
     [].forEach.call(document.querySelectorAll("#cam-map .cam-btn"), function (b) {
       b.classList.toggle("active", b.dataset.id === id);
     });
@@ -500,6 +520,7 @@
     var was = state.camOpen;
     state.camOpen = open;
     $("cam-panel").classList.toggle("open", open);
+    scenes.office.classList.toggle("cams-open", open);
     if (!open) camDownSince = performance.now();
     if (was !== open) {
       Sound.camToggle(open);
@@ -509,6 +530,9 @@
   }
   $("cam-tab").addEventListener("click", function () {
     setCamOpen(!state.camOpen);
+  });
+  $("cam-close").addEventListener("click", function () {
+    setCamOpen(false);
   });
   document.addEventListener("keydown", function (e) {
     if (!scenes.office.classList.contains("active")) return;

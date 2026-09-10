@@ -3,10 +3,9 @@
    PERSONAJES
 
    El elenco anterior se ha retirado. De momento sólo existe un
-   marcador de posición llamado "Dogo": aparece en la ficha de Elenco
-   y en la Noche Personalizada, pero todavía NO se mueve durante la
-   noche. Su arte definitivo y su comportamiento (en js/ai.js) se
-   añadirán más adelante.
+   personaje llamado "Dogo": de momento aparece únicamente en la ficha
+   de Elenco y todavía NO participa durante la noche. Su comportamiento
+   (en js/ai.js) se añadirá más adelante.
 
    Todo es data-driven: para reactivar un personaje basta con darle
    `implemented: true`, una entrada en NIGHT_AI y su lógica en el motor.
@@ -33,6 +32,22 @@
     { id: "6", name: "Cocina", x: 84, y: 66, audioOnly: true },
   ];
 
+  var CAM_BACKGROUNDS = {
+    "1A": "assets/escenarios/cam-1a-escenario.png",
+    "1B": "assets/escenarios/cam-1b-comedor.png",
+    "1C": "assets/escenarios/cam-1c-cala.png",
+    "5": "assets/escenarios/cam-5-trastienda.png",
+    "7": "assets/escenarios/cam-7-aseos.png",
+    "3": "assets/escenarios/cam-3-almacen.png",
+    "2A": "assets/escenarios/cam-2a-pasillo-oeste.png",
+    "2B": "assets/escenarios/cam-2b-esquina-oeste.png",
+    "4A": "assets/escenarios/cam-4a-pasillo-este.png",
+    "4B": "assets/escenarios/cam-4b-esquina-este.png",
+  };
+  CAMS.forEach(function (cam) {
+    cam.background = CAM_BACKGROUNDS[cam.id] || "";
+  });
+
   var DOOR_CAM = { left: "2B", right: "4B" };
 
   /* ---------------------------------------------------------------
@@ -42,17 +57,17 @@
     dogo: {
       id: "dogo",
       name: "Dogo",
-      role: "En desarrollo",
+      role: "El perro guardián",
       species: "perro",
-      color: "#9aa0aa",
-      accent: "#5f6570",
-      belly: "#d2d6dd",
+      color: "#8a4d25",
+      accent: "#342016",
+      belly: "#c49361",
+      rosterImage: "assets/personajes/DOGO/dogo-elenco.png",
       implemented: false, // <- todavía no participa en la noche
       customDefault: 0,
       bio:
-        "Marcador de posición. El arte definitivo y el comportamiento de " +
-        "este animatrónico se implementarán en una actualización posterior, " +
-        "con su propia carpeta de recursos.",
+        "Un anfitrión canino de aspecto amable, construido para acompañar " +
+        "y vigilar a los visitantes del restaurante.",
       counter: "Aún no aparece durante la noche.",
     },
   };
@@ -61,7 +76,7 @@
   var ROSTER = [];
 
   // Personajes ajustables en la pantalla de Noche Personalizada.
-  var CUSTOM_ROSTER = ["dogo"];
+  var CUSTOM_ROSTER = [];
 
   /* ---------------------------------------------------------------
      NIVELES DE IA POR NOCHE  (escala 0-20; d20 <= nivel -> avanza)
