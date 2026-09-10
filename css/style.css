@@ -1,0 +1,541 @@
+/* ================================================================
+   Five Nights at Freddy's - clon
+   Menu principal + arranque basico de partida
+   ================================================================ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+  font-family: Consolas, "Courier New", monospace;
+  color: #d8d8d8;
+  cursor: default;
+}
+
+/* Contenedor con relacion de aspecto 4:3 centrado */
+#game {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 100vw;
+  height: 75vw;
+  max-height: 100vh;
+  max-width: 133.333vh;
+  background: #000;
+  overflow: hidden;
+}
+
+/* ---------- Estatica ---------- */
+#static {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 900;
+  pointer-events: none;
+  opacity: 0.06;
+  mix-blend-mode: screen;
+}
+
+/* ---------- Escenas ---------- */
+.scene {
+  position: absolute;
+  inset: 0;
+  display: none;
+  animation: fade-in 0.4s ease;
+}
+.scene.active {
+  display: block;
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ================================================================
+   MENU PRINCIPAL
+   ================================================================ */
+#scene-menu {
+  background: radial-gradient(circle at 60% 40%, #1a1015 0%, #050505 75%);
+}
+
+.menu-title {
+  position: absolute;
+  top: 7%;
+  left: 6%;
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+  filter: drop-shadow(0 0 12px rgba(120, 0, 0, 0.35));
+  animation: title-jitter 4s steps(1) infinite;
+}
+.menu-title .line {
+  font-weight: 700;
+  color: #e6e6e6;
+  text-transform: none;
+  letter-spacing: 1px;
+}
+.menu-title .small {
+  font-size: 3.2vw;
+  margin-left: 0.3vw;
+}
+.menu-title .big {
+  font-size: 9vw;
+  margin-top: -0.5vw;
+  text-shadow: 3px 0 rgba(255, 0, 40, 0.35), -3px 0 rgba(0, 200, 255, 0.25);
+}
+.menu-title .subtitle {
+  font-size: 1.5vw;
+  color: #6a6a6a;
+  margin-top: 1vw;
+  letter-spacing: 2px;
+}
+
+@keyframes title-jitter {
+  0%,
+  97%,
+  100% {
+    transform: translate(0, 0);
+  }
+  97.5% {
+    transform: translate(-2px, 1px);
+  }
+  98.5% {
+    transform: translate(3px, -1px);
+  }
+}
+
+.menu-list {
+  position: absolute;
+  left: 7%;
+  bottom: 14%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4vw;
+}
+.menu-item {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 2.6vw;
+  color: #8c8c8c;
+  text-align: left;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.08s;
+}
+.menu-item:hover:not([disabled]),
+.menu-item.selected:not([disabled]) {
+  color: #fff;
+  text-shadow: 2px 0 rgba(255, 0, 40, 0.5), -2px 0 rgba(0, 200, 255, 0.4);
+}
+.menu-item[disabled] {
+  color: #3d3d3d;
+  cursor: default;
+}
+
+.menu-foot-left {
+  position: absolute;
+  left: 2%;
+  bottom: 2%;
+  font-size: 1.1vw;
+  color: #4c4c4c;
+  line-height: 1.5;
+}
+.menu-foot-right {
+  position: absolute;
+  right: 2%;
+  bottom: 2%;
+  font-size: 1.1vw;
+  color: #4c4c4c;
+}
+
+/* ================================================================
+   RECORTE DE PERIODICO
+   ================================================================ */
+#scene-news {
+  background: #111;
+}
+.newspaper {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 62%;
+  height: 82%;
+  background: #cfc7b3;
+  color: #17140f;
+  padding: 3.5%;
+  font-family: "Times New Roman", Georgia, serif;
+  box-shadow: 0 0 60px #000 inset, 0 0 40px #000;
+  transform: rotate(-1.2deg);
+  filter: sepia(0.35) contrast(1.05);
+  cursor: pointer;
+}
+.newspaper h1 {
+  font-size: 5vw;
+  text-align: center;
+  letter-spacing: 4px;
+  border-bottom: 3px double #17140f;
+  padding-bottom: 1vw;
+}
+.newspaper .lead {
+  font-size: 2.6vw;
+  font-weight: 700;
+  text-align: center;
+  margin: 1.5vw 0;
+}
+.newspaper p {
+  font-size: 1.7vw;
+  line-height: 1.5;
+  margin-bottom: 1vw;
+  text-align: justify;
+}
+.newspaper .pay {
+  font-size: 2.2vw;
+  font-weight: 700;
+  text-align: center;
+}
+.newspaper .small {
+  font-size: 1.2vw;
+  font-style: italic;
+  color: #443;
+}
+.newspaper .hint {
+  position: absolute;
+  bottom: 3%;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-family: Consolas, monospace;
+  font-size: 1.2vw;
+  color: #665;
+  animation: blink 1s steps(1) infinite;
+}
+@keyframes blink {
+  50% {
+    opacity: 0.2;
+  }
+}
+
+/* ================================================================
+   INTRO DE NOCHE
+   ================================================================ */
+#scene-nightintro {
+  background: #000;
+}
+.night-intro {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.night-label {
+  font-size: 4vw;
+  color: #e6e6e6;
+  letter-spacing: 4px;
+  animation: night-fade 3s ease forwards;
+}
+@keyframes night-fade {
+  0% {
+    opacity: 0;
+  }
+  25%,
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ================================================================
+   OFICINA
+   ================================================================ */
+#scene-office {
+  background: #000;
+}
+.office-view {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.office-room {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(#241b16 0%, #0c0908 60%, #050403 100%);
+}
+.office-room .desk {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 46%;
+  height: 26%;
+  transform: translateX(-50%);
+  background: linear-gradient(#3a2b20, #1c130d);
+  border-top: 3px solid #4c3a2c;
+  border-radius: 40% 40% 0 0 / 30% 30% 0 0;
+}
+.office-room .poster {
+  position: absolute;
+  left: 50%;
+  top: 22%;
+  transform: translateX(-50%) rotate(-2deg);
+  width: 14%;
+  aspect-ratio: 3/4;
+  background: #6d1414;
+  color: #ffd24a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3vw;
+  text-align: center;
+  border: 4px solid #2a0d0d;
+}
+.office-room .door {
+  position: absolute;
+  top: 0;
+  width: 15%;
+  height: 100%;
+  background: linear-gradient(#1b1512, #0a0706);
+}
+.office-room .door-left {
+  left: 0;
+  box-shadow: inset -20px 0 40px #000;
+}
+.office-room .door-right {
+  right: 0;
+  box-shadow: inset 20px 0 40px #000;
+}
+.office-room .door.closed {
+  background: #2b2b2b;
+  background-image: repeating-linear-gradient(
+    #232323 0 12px,
+    #161616 12px 24px
+  );
+}
+.office-room .door.lit {
+  background: linear-gradient(#3a322c, #201a15);
+}
+
+/* HUD */
+.hud {
+  position: absolute;
+  z-index: 500;
+  pointer-events: none;
+}
+.hud-time {
+  position: absolute;
+  top: 3%;
+  right: 4%;
+  font-size: 2.6vw;
+  color: #fff;
+}
+.hud-night {
+  position: absolute;
+  top: 9%;
+  right: 4%;
+  font-size: 1.4vw;
+  color: #cfcfcf;
+}
+.hud-power {
+  position: absolute;
+  bottom: 4%;
+  left: 4%;
+  font-size: 1.6vw;
+  color: #fff;
+}
+.hud-power .usage {
+  color: #35d635;
+  margin-left: 0.4vw;
+  letter-spacing: -2px;
+}
+
+/* Controles */
+.ctrl {
+  position: absolute;
+  z-index: 500;
+  font-family: inherit;
+  font-size: 1vw;
+  padding: 0.5vw 1vw;
+  color: #d8d8d8;
+  background: #1c1c1c;
+  border: 1px solid #444;
+  cursor: pointer;
+}
+.ctrl:hover {
+  background: #2c2c2c;
+}
+.ctrl.active {
+  background: #d8d8d8;
+  color: #111;
+}
+.ctrl-left-door {
+  left: 17%;
+  bottom: 30%;
+}
+.ctrl-left-light {
+  left: 17%;
+  bottom: 24%;
+}
+.ctrl-right-door {
+  right: 17%;
+  bottom: 30%;
+}
+.ctrl-right-light {
+  right: 17%;
+  bottom: 24%;
+}
+
+/* Pestana de camaras */
+.cam-tab {
+  position: absolute;
+  z-index: 500;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30%;
+  text-align: center;
+  padding: 0.5vw 0;
+  font-size: 1.2vw;
+  letter-spacing: 3px;
+  background: rgba(20, 20, 20, 0.85);
+  border: 1px solid #444;
+  border-bottom: none;
+  cursor: pointer;
+}
+.cam-tab:hover {
+  background: rgba(45, 45, 45, 0.95);
+}
+
+/* Panel de camaras */
+.cam-panel {
+  position: absolute;
+  inset: 0;
+  z-index: 600;
+  background: #000;
+  display: none;
+  animation: fade-in 0.15s ease;
+}
+.cam-panel.open {
+  display: block;
+}
+.cam-feed {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(#15130f, #000);
+}
+.cam-feed::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    rgba(255, 255, 255, 0.03) 0 2px,
+    transparent 2px 4px
+  );
+  animation: scan 6s linear infinite;
+}
+@keyframes scan {
+  to {
+    background-position: 0 200px;
+  }
+}
+.cam-name {
+  position: absolute;
+  top: 4%;
+  left: 4%;
+  font-size: 2vw;
+  color: #fff;
+}
+.cam-rec {
+  position: absolute;
+  top: 4%;
+  right: 4%;
+  font-size: 1.4vw;
+  color: #ff3b3b;
+  animation: blink 1.4s steps(1) infinite;
+}
+.cam-map {
+  position: absolute;
+  right: 3%;
+  bottom: 3%;
+  width: 34%;
+  height: 42%;
+  background: rgba(10, 10, 10, 0.9);
+  border: 1px solid #555;
+}
+.cam-btn {
+  position: absolute;
+  font-size: 0.9vw;
+  padding: 0.3vw 0.5vw;
+  background: #222;
+  color: #cfcfcf;
+  border: 1px solid #555;
+  cursor: pointer;
+}
+.cam-btn:hover {
+  background: #333;
+}
+.cam-btn.active {
+  background: #cfcfcf;
+  color: #111;
+}
+
+/* ================================================================
+   6 A.M. / SIN ENERGIA
+   ================================================================ */
+#scene-6am,
+#scene-poweroff {
+  background: #000;
+}
+.six-am,
+.power-off {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2vw;
+}
+.six-am .am-time {
+  font-size: 6vw;
+  color: #fff;
+  letter-spacing: 6px;
+}
+.six-am .am-sub {
+  font-size: 1.8vw;
+  color: #b8b8b8;
+}
+.power-off span {
+  font-size: 3vw;
+  color: #9a9a9a;
+  letter-spacing: 4px;
+}
+.am-continue {
+  margin-top: 2vw;
+  font-family: inherit;
+  font-size: 1.6vw;
+  color: #d8d8d8;
+  background: #1c1c1c;
+  border: 1px solid #555;
+  padding: 0.8vw 2vw;
+  cursor: pointer;
+}
+.am-continue:hover {
+  background: #2c2c2c;
+  color: #fff;
+}
