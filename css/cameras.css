@@ -1,0 +1,109 @@
+/* ================================================================
+   CÁMARAS: pestaña, barra de cierre, panel, feed, mapa y sprite
+   ================================================================ */
+
+/* pestaña para abrir el monitor */
+.cam-tab {
+  position: absolute; z-index: 500; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 32%; text-align: center; padding: 0.4vw 0; cursor: pointer;
+  background: rgba(18, 18, 18, 0.85); border: 1px solid #444; border-bottom: none;
+}
+.cam-tab span { font-size: 1.1vw; letter-spacing: 4px; opacity: 0.7; }
+.cam-tab:hover { background: rgba(45, 45, 45, 0.95); }
+.cam-tab::before {
+  content: ""; position: absolute; left: 50%; top: -6px; transform: translateX(-50%);
+  border: 6px solid transparent; border-bottom-color: #777;
+}
+#scene-office.cams-open .cam-tab { display: none; }
+
+/* barra para cerrar el monitor (dentro del panel) */
+.cam-close {
+  position: absolute; z-index: 5; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 46%; padding: 0.55vw 0; cursor: pointer;
+  font-family: inherit; color: #cdd6cd;
+  background: linear-gradient(rgba(20, 26, 20, 0.4), rgba(12, 16, 12, 0.92));
+  border: 1px solid #5a6a5a; border-bottom: none;
+}
+.cam-close span { font-size: 1.05vw; letter-spacing: 3px; }
+.cam-close:hover { background: linear-gradient(rgba(40, 50, 40, 0.5), rgba(20, 26, 20, 0.96)); color: #fff; }
+
+/* panel */
+.cam-panel { position: absolute; inset: 0; z-index: 600; background: #000; display: none; }
+.cam-panel.open { display: block; animation: fade-in 0.12s ease; }
+
+.cam-feed {
+  position: absolute; inset: 0; overflow: hidden;
+  background:
+    repeating-linear-gradient(115deg, rgba(255,255,255,0.02) 0 3px, transparent 3px 7px),
+    linear-gradient(#1a1712, #050403);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+.cam-feed::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(rgba(255,255,255,0.035) 0 2px, transparent 2px 4px);
+  animation: scan 6s linear infinite;
+}
+@keyframes scan { to { background-position: 0 220px; } }
+
+.cam-character-sprite {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  bottom: 6%;
+  width: 46%;
+  height: auto;
+  max-height: 96%;
+  transform: translateX(-50%);
+  display: none;
+  filter: brightness(0.66) contrast(1.2) saturate(0.75);
+  pointer-events: none;
+}
+.cam-character-sprite.show { display: block; }
+
+.cam-glitch {
+  position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: repeating-linear-gradient(rgba(255,255,255,0.4) 0 1px, transparent 1px 3px);
+  mix-blend-mode: overlay;
+}
+.cam-glitch.burst { animation: glitch 0.28s steps(2) 1; }
+@keyframes glitch {
+  0% { opacity: 0.9; transform: translateX(-3%); }
+  50% { opacity: 0.5; transform: translateX(3%); }
+  100% { opacity: 0; }
+}
+
+.cam-name { position: absolute; top: 4%; left: 4%; font-size: 1.9vw; color: #fff; z-index: 2; text-shadow: 0 0 6px #000; }
+.cam-rec { position: absolute; top: 4%; right: 4%; font-size: 1.3vw; color: #ff3b3b; animation: blink 1.4s steps(1) infinite; z-index: 2; }
+.cam-clock { position: absolute; bottom: 3%; right: 4%; font-size: 1.3vw; color: #cfcfcf; z-index: 2; }
+
+.cam-disabled {
+  position: absolute; inset: 0; display: none;
+  flex-direction: column; align-items: center; justify-content: center;
+  background: #000; color: #444; font-size: 1.3vw; letter-spacing: 3px; text-align: center;
+}
+.cam-disabled span { font-size: 2vw; color: #666; }
+.cam-disabled.show { display: flex; }
+
+/* mapa */
+.cam-map {
+  position: absolute; right: 3%; bottom: 9%; width: 36%; height: 44%;
+  background: linear-gradient(rgba(30,45,35,0.9), rgba(12,18,14,0.95));
+  border: 1px solid #4a5a4a; z-index: 3;
+  background-image: linear-gradient(rgba(120,160,130,0.06) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(120,160,130,0.06) 1px, transparent 1px);
+  background-size: 8% 12%;
+}
+.map-office {
+  position: absolute; left: 50%; bottom: 3%; transform: translateX(-50%);
+  font-size: 0.85vw; letter-spacing: 2px; color: #8fae95;
+  border: 1px solid #6a8a70; padding: 0.2vw 0.8vw;
+}
+.cam-btn {
+  position: absolute; font-size: 0.82vw; padding: 0.25vw 0.5vw;
+  background: #1f291f; color: #bcd; border: 1px solid #5a6a5a; cursor: pointer;
+  transform: translate(-50%, -50%); white-space: nowrap;
+}
+.cam-btn:hover { background: #2c382c; }
+.cam-btn.active { background: #cfe0cf; color: #10160f; border-color: #cfe0cf; }

@@ -1,0 +1,58 @@
+/* ================================================================
+   OFICINA: vista por capas, sprite de puerta, HUD y controles
+   ================================================================ */
+#scene-office { background: #000; }
+.office-view { position: absolute; inset: 0; overflow: hidden; background: #000; }
+
+/* capas de imagen: base + puertas cerradas + luces encendidas */
+.office-layers { position: absolute; inset: 0; transition: filter 0.4s; }
+.office-layer {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
+  opacity: 0;
+  transition: opacity 0.1s linear;
+  pointer-events: none;
+}
+#ofc-base { opacity: 1; }
+.office-layer.on { opacity: 1; }
+
+#scene-office.blackout .office-layers { filter: brightness(0.05) contrast(1.4); }
+
+/* personaje asomado a la puerta (el render trae fondo oscuro pegado) */
+.dogo-door-sprite {
+  position: absolute;
+  z-index: 3;
+  right: 0.5%;
+  bottom: 2%;
+  width: 24%;
+  height: 92%;
+  object-fit: contain;
+  object-position: right bottom;
+  display: none;
+  mix-blend-mode: screen;
+  filter: brightness(0.85) contrast(1.1);
+  pointer-events: none;
+}
+.dogo-door-sprite.show { display: block; }
+
+/* ---------- HUD ---------- */
+.hud { position: absolute; z-index: 500; pointer-events: none; inset: 0; }
+.hud-time { position: absolute; top: 3%; right: 4%; font-size: 2.6vw; color: #fff; }
+.hud-time.tick { animation: tick 0.5s ease; }
+@keyframes tick { 0% { transform: scale(1.25); color: #ffd24a; } 100% { transform: scale(1); } }
+.hud-night { position: absolute; top: 9.5%; right: 4%; font-size: 1.3vw; color: #cfcfcf; }
+.hud-power { position: absolute; bottom: 4%; left: 4%; font-size: 1.5vw; color: #fff; line-height: 1.5; }
+.hud-power .usage { letter-spacing: -2px; }
+
+/* ---------- controles ---------- */
+.ctrl {
+  position: absolute; z-index: 500; font-family: inherit; font-size: 1vw;
+  padding: 0.5vw 1vw; color: #d8d8d8; background: #1c1c1c; border: 1px solid #444; cursor: pointer;
+}
+.ctrl:hover { background: #2c2c2c; }
+.ctrl.active { background: #d8d8d8; color: #111; }
+.ctrl-left-door { left: 15%; bottom: 32%; }
+.ctrl-left-light { left: 15%; bottom: 25%; }
+.ctrl-right-door { right: 15%; bottom: 32%; }
+.ctrl-right-light { right: 15%; bottom: 25%; }

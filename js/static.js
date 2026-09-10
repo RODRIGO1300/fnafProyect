@@ -1,35 +1,47 @@
 /* ================================================================
-   Efecto de estatica de television dibujado en canvas.
-   Se ejecuta de forma continua a baja opacidad sobre toda la escena.
+   Five Nights at Freddy's - clon
+   FX: estática de televisión dibujada en canvas, a baja opacidad
+   sobre toda la escena.
    ================================================================ */
 (function () {
   "use strict";
 
-  var canvas = document.getElementById("static");
-  var ctx = canvas.getContext("2d");
-  var W = 320;
-  var H = 240;
+  var FNAF = window.FNAF;
+  var cfg = FNAF.config;
 
+  var canvas = FNAF.$("static");
+  var ctx = canvas.getContext("2d");
+  var W = cfg.staticSize[0];
+  var H = cfg.staticSize[1];
   canvas.width = W;
   canvas.height = H;
 
   var image = ctx.createImageData(W, H);
   var buffer = new Uint32Array(image.data.buffer);
   var frame = 0;
+  var running = true;
 
   function render() {
-    // Regenerar el ruido cada 2 frames para un parpadeo mas suave
-    if (frame % 2 === 0) {
+    if (running && frame % cfg.staticEveryNFrames === 0) {
       for (var i = 0; i < buffer.length; i++) {
         var v = (Math.random() * 255) | 0;
-        // 0xAABBGGRR (little-endian)
-        buffer[i] = (255 << 24) | (v << 16) | (v << 8) | v;
+        buffer[i] = (255 << 24) | (v << 16) | (v << 8) | v; // 0xAABBGGRR
       }
       ctx.putImageData(image, 0, 0);
     }
     frame++;
     requestAnimationFrame(render);
   }
+
+  // Pausa el ruido cuando la pestaña no está visible (ahorra CPU).
+  document.addEventListener("visibilitychange", function () {
+    running = !document.hidden;
+  });
+
+  FNAF.fx = FNAF.fx || {};
+  FNAF.fx.staticPause = function (v) {
+    running = !v;
+  };
 
   render();
 })();

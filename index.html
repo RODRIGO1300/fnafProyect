@@ -4,7 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Five Nights at Freddy's - Clon</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/menu.css" />
+  <link rel="stylesheet" href="css/intro.css" />
+  <link rel="stylesheet" href="css/office.css" />
+  <link rel="stylesheet" href="css/cameras.css" />
+  <link rel="stylesheet" href="css/endings.css" />
 </head>
 <body>
   <div id="game">
@@ -16,7 +21,7 @@
       <button class="sound-toggle" id="sound-toggle" title="Sonido">&#128266;</button>
 
       <div class="menu-dogo" aria-hidden="true">
-        <img src="assets/personajes/DOGO/dogo-elenco.png" alt="" />
+        <img src="assets/personajes/DOGO/dogo-elenco.webp" alt="" />
       </div>
 
       <div class="menu-title">
@@ -37,7 +42,7 @@
       <div class="menu-foot-left">
         Fan project.<br />No afiliado con Scott Cawthon / Scott Games.
       </div>
-      <div class="menu-foot-right">v0.3</div>
+      <div class="menu-foot-right">v0.4</div>
     </section>
 
     <!-- ============ ELENCO ============ -->
@@ -79,7 +84,7 @@
     </section>
 
     <!-- ============ RECORTE DE PERIODICO ============ -->
-    <!-- El texto va en la propia imagen (periodico-inicio.png). -->
+    <!-- El texto va en la propia imagen (periodico-inicio.webp). -->
     <section id="scene-news" class="scene">
       <div class="newspaper">
         <p class="hint">[ Clic para continuar ]</p>
@@ -99,18 +104,19 @@
       <div class="office-view" id="office-view">
         <div class="office-layers">
           <img class="office-layer" id="ofc-base"
-               src="assets/escenarios/sala-seguridad/oficina-base.png" alt="" />
+               src="assets/escenarios/sala-seguridad/oficina-base.webp" alt="" />
           <img class="office-layer" id="ofc-door-left"
-               src="assets/escenarios/sala-seguridad/puerta-izquierda-cerrada.png" alt="" />
+               src="assets/escenarios/sala-seguridad/puerta-izquierda-cerrada.webp" alt="" />
           <img class="office-layer" id="ofc-door-right"
-               src="assets/escenarios/sala-seguridad/puerta-derecha-cerrada.png" alt="" />
+               src="assets/escenarios/sala-seguridad/puerta-derecha-cerrada.webp" alt="" />
           <img class="office-layer" id="ofc-light-left"
-               src="assets/escenarios/sala-seguridad/luz-izquierda-encendida.png" alt="" />
+               src="assets/escenarios/sala-seguridad/luz-izquierda-encendida.webp" alt="" />
           <img class="office-layer" id="ofc-light-right"
-               src="assets/escenarios/sala-seguridad/luz-derecha-encendida.png" alt="" />
+               src="assets/escenarios/sala-seguridad/luz-derecha-encendida.webp" alt="" />
         </div>
         <img class="dogo-door-sprite" id="dogo-door-right"
-             src="assets/personajes/DOGO/sprites/oficina/puerta-derecha.png" alt="Dogo en la puerta derecha" />
+             src="assets/personajes/DOGO/sprites/oficina/puerta-derecha.webp"
+             alt="Dogo en la puerta derecha" />
       </div>
 
       <div class="hud">
@@ -172,10 +178,21 @@
     </section>
   </div>
 
-  <script src="js/static.js"></script>
+  <!-- Núcleo -->
+  <script src="js/core.js"></script>
+  <script src="js/assets.js"></script>
   <script src="js/audio.js"></script>
-  <script src="js/characters.js"></script>
+  <script src="js/static.js"></script>
+  <!-- Mundo + IA -->
+  <script src="js/world.js"></script>
   <script src="js/ai.js"></script>
-  <script src="js/game.js"></script>
+  <!-- Sistemas -->
+  <script src="js/scenes.js"></script>
+  <script src="js/night.js"></script>
+  <script src="js/office.js"></script>
+  <script src="js/cameras.js"></script>
+  <script src="js/menu.js"></script>
+  <!-- Arranque -->
+  <script src="js/main.js"></script>
 </body>
 </html>

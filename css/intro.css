@@ -1,0 +1,30 @@
+/* ================================================================
+   PERIÓDICO de inicio + INTRO de noche
+   ================================================================ */
+#scene-news {
+  background: #0a0a0a url("../assets/escenarios/periodico-inicio.webp") center / contain no-repeat;
+}
+.newspaper {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+}
+.newspaper .hint {
+  position: absolute; bottom: 3%; left: 0; width: 100%; text-align: center;
+  font-family: Consolas, monospace; font-size: 1.2vw; color: #cfc3a4;
+  text-shadow: 0 0 8px #000, 0 0 3px #000;
+  animation: blink 1s steps(1) infinite;
+}
+
+#scene-nightintro { background: #000; }
+.night-intro {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 1vw;
+  animation: night-fade 3s ease forwards;
+}
+.night-clock { font-size: 2vw; color: #8a8a8a; letter-spacing: 3px; }
+.night-label { font-size: 4vw; color: #e6e6e6; letter-spacing: 4px; }
+@keyframes night-fade {
+  0% { opacity: 0; } 25%, 70% { opacity: 1; } 100% { opacity: 0; }
+}
