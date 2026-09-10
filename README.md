@@ -7,8 +7,23 @@ cámaras del ala este; el resto del elenco (Caty, Roy, Remy) está reservado.
 
 ## Cómo jugar
 
-Abre `index.html` en un navegador moderno (doble clic). No necesita
-servidor ni dependencias. Haz un clic para activar el sonido.
+Es una **aplicación de escritorio** (Electron). Para generar el
+ejecutable:
+
+```
+npm install
+npm run pack
+```
+
+Se crea `dist/FNAF Clon-win32-x64/FNAF Clon.exe` (carpeta portable, se
+puede mover o comprimir entera). `npm start` lo lanza sin empaquetar.
+
+Para un instalador único: `npm run dist` (necesita *Modo desarrollador*
+de Windows o terminal como administrador). Detalles en
+[`ARCHITECTURE.md`](ARCHITECTURE.md).
+
+> El mismo `index.html` también abre en un navegador para desarrollo
+> rápido, pero el producto es el `.exe`.
 
 ## Controles
 
@@ -30,6 +45,11 @@ Código modular sin build (se abre con `file://`, sin ES modules). Cada
 `js/*.js` cuelga de `window.FNAF` y se cablea por un bus de eventos.
 
 ```
+package.json          Electron + scripts de empaquetado
+desktop/
+  main.js             proceso principal de Electron (ventana)
+  preload.js          puente seguro (window.desktop)
+build/icon.ico        icono de la app
 index.html            escenas + orden de carga
 css/
   base.css            reset, marco 4:3, escenas, responsive

@@ -58,6 +58,13 @@
       return e.dataset.action === a;
     })[0];
   }
+
+  // "Salir" sólo tiene sentido en el ejecutable (Electron).
+  var quitItem = itemByAction("quit");
+  if (quitItem && window.desktop && window.desktop.isDesktop) {
+    quitItem.hidden = false;
+    quitItem.disabled = false;
+  }
   function refresh() {
     var max = FNAF.storage.getMaxNight();
     itemByAction("continue").disabled = max <= 1;
@@ -95,6 +102,9 @@
         break;
       case "roster":
         openRoster();
+        break;
+      case "quit":
+        if (window.desktop && window.desktop.quit) window.desktop.quit();
         break;
     }
   }

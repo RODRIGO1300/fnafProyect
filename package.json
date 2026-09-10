@@ -1,0 +1,63 @@
+{
+  "name": "fnaf-clon",
+  "version": "0.4.0",
+  "description": "Clon del primer Five Nights at Freddy's (proyecto de práctica)",
+  "author": "Rodrigo Hernandez",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "desktop/main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-packager . \"FNAF Clon\" --platform=win32 --arch=x64 --out=dist --overwrite --icon=build/icon.ico --app-version=0.4.0 --prune=true --ignore=\"^/(dist|tools|\\.git|\\.claude|\\.vscode)($|/)\" --ignore=\"^/(\\.gitignore|package-lock\\.json|.*\\.md)$\"",
+    "dist": "electron-builder --win",
+    "dist:portable": "electron-builder --win portable",
+    "dist:dir": "electron-builder --win --dir"
+  },
+  "devDependencies": {
+    "@electron/packager": "^20.3.0",
+    "electron": "^31.7.7",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.rodrigohernandez.fnafclon",
+    "productName": "FNAF Clon",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "index.html",
+      "css/**/*",
+      "js/**/*",
+      "assets/**/*",
+      "desktop/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "FNAF Clon"
+    },
+    "portable": {
+      "artifactName": "FNAF-Clon-portable-${version}.exe"
+    }
+  }
+}

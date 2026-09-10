@@ -15,7 +15,7 @@
   100% { transform: translate(-5px, -4px) scale(1.03); }
 }
 
-#scene-gameover, #scene-6am { background: #000; }
+#scene-gameover, #scene-sixam { background: #000; }
 .endcard {
   position: absolute; inset: 0;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.6vw;

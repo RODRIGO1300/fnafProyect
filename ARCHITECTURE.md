@@ -1,8 +1,36 @@
 # Arquitectura
 
-Juego de una sola página, sin build ni dependencias. Se abre con
-`file://`, así que **no** se usan ES modules: cada archivo es un
-`<script>` clásico que cuelga de `window.FNAF`.
+El juego es una sola página (HTML/CSS/JS vanilla, sin build) que se
+**empaqueta como ejecutable de escritorio con Electron**. El mismo
+`index.html` funciona dentro de la ventana de Electron; también abre en
+un navegador para desarrollo rápido.
+
+Como se carga con `file://`, **no** se usan ES modules: cada archivo es
+un `<script>` clásico que cuelga de `window.FNAF`.
+
+## Capa de escritorio (`desktop/`)
+
+| Archivo | Qué hace |
+|---|---|
+| `desktop/main.js` | Proceso principal de Electron: crea la `BrowserWindow` (4:3, sin menú, `backgroundThrottling:false`), carga `index.html`, F11 pantalla completa, instancia única, abre enlaces externos en el navegador del sistema. |
+| `desktop/preload.js` | Puente con `contextIsolation`: expone `window.desktop` (`isDesktop`, `quit()`, `toggleFullscreen()`). El juego sólo lo usa para mostrar el botón **Salir** del menú. |
+
+El código del juego (`js/*.js`) no sabe si corre en Electron o en un
+navegador; sólo comprueba `window.desktop`.
+
+## Construir el ejecutable
+
+```
+npm install
+npm run pack     # -> dist/FNAF Clon-win32-x64/FNAF Clon.exe  (carpeta portable)
+npm start        # ejecuta sin empaquetar (modo desarrollo, con DevTools)
+```
+
+`npm run pack` usa **@electron/packager** y no necesita permisos
+especiales. Para un **instalador NSIS + .exe portable único** hay
+`npm run dist` (electron-builder), pero en Windows requiere *Modo
+desarrollador* activado o terminal como administrador (electron-builder
+extrae symlinks para firmar en su caché).
 
 ## Flujo de carga (orden en `index.html`)
 

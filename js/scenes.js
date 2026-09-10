@@ -21,7 +21,9 @@
 
   var els = {};
   NAMES.forEach(function (n) {
-    els[n] = FNAF.$("scene-" + n);
+    var el = FNAF.$("scene-" + n);
+    if (!el) throw new Error('Falta <section id="scene-' + n + '"> en index.html');
+    els[n] = el;
   });
 
   var current = "menu";
