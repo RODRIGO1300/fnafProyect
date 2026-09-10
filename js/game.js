@@ -99,12 +99,22 @@
   var lastTs = 0;
   var camDownSince = 0;
 
-  // Precarga de los fondos de cámara para que el cambio no parpadee.
-  (function preloadCams() {
+  // Precarga de imágenes (cámaras + capas de la oficina) para que no
+  // parpadeen al mostrarse por primera vez.
+  (function preloadImages() {
+    var urls = [];
     C.CAMS.forEach(function (cam) {
-      if (!cam.background) return;
+      if (cam.background) urls.push(cam.background);
+    });
+    urls.push(
+      "assets/escenarios/sala-seguridad/puerta-izquierda-cerrada.png",
+      "assets/escenarios/sala-seguridad/puerta-derecha-cerrada.png",
+      "assets/escenarios/sala-seguridad/luz-izquierda-encendida.png",
+      "assets/escenarios/sala-seguridad/luz-derecha-encendida.png"
+    );
+    urls.forEach(function (u) {
       var img = new Image();
-      img.src = cam.background;
+      img.src = u;
     });
   })();
 
@@ -422,13 +432,12 @@
      PUERTAS Y LUCES
      --------------------------------------------------------------- */
   function syncDoors() {
-    var dl = $("door-left"), dr = $("door-right");
-    dl.classList.toggle("closed", state.doorLeft);
-    dr.classList.toggle("closed", state.doorRight);
-    dl.classList.toggle("lit", state.lightLeft && !state.doorLeft);
-    dr.classList.toggle("lit", state.lightRight && !state.doorRight);
-    $("hall-left").classList.toggle("on", state.lightLeft && !state.doorLeft);
-    $("hall-right").classList.toggle("on", state.lightRight && !state.doorRight);
+    // capas de imagen de la oficina
+    $("ofc-door-left").classList.toggle("on", state.doorLeft);
+    $("ofc-door-right").classList.toggle("on", state.doorRight);
+    $("ofc-light-left").classList.toggle("on", state.lightLeft && !state.doorLeft);
+    $("ofc-light-right").classList.toggle("on", state.lightRight && !state.doorRight);
+    // estado de los botones
     $("btn-left-door").classList.toggle("active", state.doorLeft);
     $("btn-right-door").classList.toggle("active", state.doorRight);
     $("btn-left-light").classList.toggle("active", state.lightLeft);

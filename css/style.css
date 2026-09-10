@@ -68,6 +68,37 @@ html, body {
    ================================================================ */
 #scene-menu { background: radial-gradient(circle at 62% 42%, #1c1116 0%, #050505 72%); }
 
+.menu-dogo {
+  position: absolute;
+  right: 2%;
+  bottom: -21%;
+  width: 52%;
+  height: 122%;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.72;
+  filter: brightness(0.42) contrast(1.35) saturate(0.7)
+    drop-shadow(-2vw 0 3vw rgba(120, 0, 20, 0.2));
+}
+.menu-dogo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #050505 0%, transparent 38%, rgba(0, 0, 0, 0.2));
+}
+.menu-dogo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  animation: dogo-menu-flicker 5s steps(1) infinite;
+}
+@keyframes dogo-menu-flicker {
+  0%, 94%, 100% { opacity: 1; transform: translateX(0); }
+  95% { opacity: 0.45; transform: translateX(-3px); }
+  96% { opacity: 0.85; transform: translateX(2px); }
+}
+
 .sound-toggle {
   position: absolute;
   top: 2.5%;
@@ -248,34 +279,20 @@ html, body {
    PERIODICO
    ================================================================ */
 #scene-news {
-  background: #111 url("../assets/escenarios/periodico-inicio.png") center / cover no-repeat;
+  background: #0a0a0a url("../assets/escenarios/periodico-inicio.png") center / contain no-repeat;
 }
 .newspaper {
   position: absolute;
   inset: 0;
-  margin: auto;
-  width: 62%;
-  height: 82%;
-  background: rgba(207, 199, 179, 0.2);
-  color: #17140f;
-  padding: 3.5%;
-  font-family: "Times New Roman", Georgia, serif;
-  box-shadow: 0 0 60px #000 inset, 0 0 40px #000;
-  transform: rotate(-1.2deg);
-  filter: sepia(0.35) contrast(1.05);
   cursor: pointer;
 }
-.newspaper h1 { font-size: 5vw; text-align: center; letter-spacing: 4px; border-bottom: 3px double #17140f; padding-bottom: 1vw; }
-.newspaper .lead { font-size: 2.6vw; font-weight: 700; text-align: center; margin: 1.5vw 0; }
-.newspaper p { font-size: 1.7vw; line-height: 1.5; margin-bottom: 1vw; text-align: justify; }
-.newspaper .pay { font-size: 2.2vw; font-weight: 700; text-align: center; }
-.newspaper .small { font-size: 1.2vw; font-style: italic; color: #443; }
 .newspaper .hint {
   position: absolute; bottom: 3%; left: 0; width: 100%; text-align: center;
-  font-family: Consolas, monospace; font-size: 1.2vw; color: #665;
+  font-family: Consolas, monospace; font-size: 1.2vw; color: #cfc3a4;
+  text-shadow: 0 0 8px #000, 0 0 3px #000;
   animation: blink 1s steps(1) infinite;
 }
-@keyframes blink { 50% { opacity: 0.2; } }
+@keyframes blink { 50% { opacity: 0.25; } }
 
 /* ================================================================
    INTRO DE NOCHE
@@ -297,76 +314,23 @@ html, body {
    OFICINA
    ================================================================ */
 #scene-office { background: #000; }
-.office-view { position: absolute; inset: 0; overflow: hidden; }
-.office-room {
+.office-view { position: absolute; inset: 0; overflow: hidden; background: #000; }
+
+/* Capas de imagen de la oficina: base + puertas cerradas + luces */
+.office-layers { position: absolute; inset: 0; transition: filter 0.4s; }
+.office-layer {
   position: absolute; inset: 0;
-  background:
-    radial-gradient(ellipse at 50% 120%, rgba(120, 90, 60, 0.25), transparent 60%),
-    linear-gradient(#2a201a 0%, #120d0a 55%, #060403 100%);
-  transition: filter 0.4s;
-}
-.wall-light {
-  position: absolute; left: 25%; right: 25%; top: 0; height: 55%;
-  background: radial-gradient(ellipse at 50% 0%, rgba(255, 210, 150, 0.10), transparent 70%);
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
+  opacity: 0;
+  transition: opacity 0.1s linear;
   pointer-events: none;
+  user-select: none;
 }
-#scene-office.blackout .office-room { filter: brightness(0.05) contrast(1.4); }
-#scene-office.blackout .wall-light { display: none; }
+#ofc-base { opacity: 1; }
+.office-layer.on { opacity: 1; }
 
-.office-room .desk {
-  position: absolute; left: 50%; bottom: 0; width: 52%; height: 27%;
-  transform: translateX(-50%);
-  background: linear-gradient(#3a2b20, #180f0a);
-  border-top: 3px solid #4c3a2c;
-  border-radius: 42% 42% 0 0 / 32% 32% 0 0;
-}
-.desk-fan {
-  position: absolute; left: 14%; top: -32%; width: 16%; aspect-ratio: 1;
-}
-.desk-fan .fan-blades {
-  position: absolute; inset: 0; border-radius: 50%;
-  background: conic-gradient(#5a5a5a 0 25%, #2a2a2a 0 50%, #5a5a5a 0 75%, #2a2a2a 0);
-  animation: spin 0.12s linear infinite;
-  box-shadow: 0 0 0 3px #333, inset 0 0 12px #000;
-}
-.desk-fan::after {
-  content: ""; position: absolute; left: 46%; bottom: -60%; width: 8%; height: 70%;
-  background: #333;
-}
-#scene-office.blackout .fan-blades { animation-play-state: paused; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.desk-tablet {
-  position: absolute; right: 16%; top: -8%; width: 22%; height: 46%;
-  background: linear-gradient(#101010, #1c1c1c);
-  border: 2px solid #333; border-radius: 3px;
-}
-
-.office-room .poster {
-  position: absolute; left: 50%; top: 17%; transform: translateX(-50%) rotate(-2deg);
-  width: 12%; aspect-ratio: 3 / 4;
-  background: #6d1414; color: #ffd24a;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.1vw; text-align: center; border: 4px solid #2a0d0d;
-}
-
-.office-room .door {
-  position: absolute; top: 0; width: 16%; height: 100%;
-  background: linear-gradient(#1c1512, #0a0706);
-}
-.office-room .door-left { left: 0; box-shadow: inset -22px 0 44px #000; }
-.office-room .door-right { right: 0; box-shadow: inset 22px 0 44px #000; }
-.door .door-slats {
-  position: absolute; inset: 0; opacity: 0;
-  background: repeating-linear-gradient(#242424 0 14px, #141414 14px 28px);
-  transition: opacity 0.12s;
-}
-.office-room .door.closed .door-slats { opacity: 1; }
-.office-room .door.lit { background: linear-gradient(#3c342d, #221b15); }
-
-.hall { position: absolute; top: 8%; height: 84%; width: 16%; pointer-events: none; opacity: 0; transition: opacity 0.1s; }
-.hall-left { left: 0; background: linear-gradient(90deg, rgba(255,220,170,0.16), transparent); }
-.hall-right { right: 0; background: linear-gradient(270deg, rgba(255,220,170,0.16), transparent); }
-.hall.on { opacity: 1; }
+#scene-office.blackout .office-layers { filter: brightness(0.05) contrast(1.4); }
 
 /* HUD */
 .hud { position: absolute; z-index: 500; pointer-events: none; inset: 0; }
