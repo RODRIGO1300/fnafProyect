@@ -22,8 +22,9 @@ Para un instalador único: `npm run dist` (necesita *Modo desarrollador*
 de Windows o terminal como administrador). Detalles en
 [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
-> El mismo `index.html` también abre en un navegador para desarrollo
-> rápido, pero el producto es el `.exe`.
+> Abrir `index.html` directamente en un navegador **no funciona**: sólo
+> muestra un aviso. El juego se ejecuta únicamente desde el `.exe` (o
+> con `npm start`).
 
 ## Controles
 
@@ -59,6 +60,7 @@ css/
   cameras.css         monitor, feed, mapa, sprite
   endings.css         jumpscare, game over, 6 a.m.
 js/
+  platform.js         guarda: bloquea la apertura fuera del ejecutable
   core.js             namespace, helpers, config, storage, bus, state
   assets.js           manifiesto de rutas + precarga
   audio.js            sonido procedural (WebAudio)

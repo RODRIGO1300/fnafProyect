@@ -6,6 +6,8 @@
 (function () {
   "use strict";
 
+  if (window.__BLOCKED__) return;
+
   var FNAF = window.FNAF;
   var cfg = FNAF.config;
 

@@ -10,6 +10,9 @@
 (function () {
   "use strict";
 
+  // Abierto fuera del ejecutable: js/platform.js ya mostró el aviso.
+  if (window.__BLOCKED__) return;
+
   var FNAF = window.FNAF;
 
   FNAF.assets.preloadAll();

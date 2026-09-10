@@ -7,6 +7,8 @@
 (function () {
   "use strict";
 
+  if (window.__BLOCKED__) return;
+
   var FNAF = window.FNAF;
   var state = FNAF.state;
   var Sound = FNAF.Sound;

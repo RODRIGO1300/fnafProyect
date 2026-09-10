@@ -1,9 +1,10 @@
 # Arquitectura
 
 El juego es una sola página (HTML/CSS/JS vanilla, sin build) que se
-**empaqueta como ejecutable de escritorio con Electron**. El mismo
-`index.html` funciona dentro de la ventana de Electron; también abre en
-un navegador para desarrollo rápido.
+**empaqueta como ejecutable de escritorio con Electron**. Sólo se
+ejecuta dentro de Electron: `js/platform.js` detecta `window.desktop`
+(que define `desktop/preload.js`) y, si falta, muestra un aviso y no
+arranca. Cada módulo comprueba `window.__BLOCKED__`.
 
 Como se carga con `file://`, **no** se usan ES modules: cada archivo es
 un `<script>` clásico que cuelga de `window.FNAF`.
@@ -35,8 +36,8 @@ extrae symlinks para firmar en su caché).
 ## Flujo de carga (orden en `index.html`)
 
 ```
-core → assets → audio → static → world → ai
-     → scenes → night → office → cameras → menu → main
+platform → core → assets → audio → static → world → ai
+         → scenes → night → office → cameras → menu → main
 ```
 
 Cada módulo se registra en el bus de eventos al cargarse; `main.js`
@@ -46,6 +47,7 @@ sólo precarga recursos, arranca el audio y muestra el menú.
 
 | Archivo | Responsabilidad | Expone |
 |---|---|---|
+| `platform.js` | Guarda: si no se corre dentro de Electron (`window.desktop`), inyecta un aviso y marca `window.__BLOCKED__`; el resto de módulos se auto-desactivan. | `window.__BLOCKED__` |
 | `core.js` | Espacio de nombres, helpers (`$`, `qs`, `qsa`, `clamp`…), **config** (todos los números ajustables), **storage** (progreso + sonido), **bus** de eventos, `state` compartido. | `FNAF.config`, `FNAF.state`, `FNAF.bus`, `FNAF.storage`, helpers |
 | `assets.js` | Manifiesto único de rutas de escenario/oficina + precargador. | `FNAF.assets` |
 | `audio.js` | Sonido 100 % procedural (WebAudio). | `FNAF.Sound` |
